@@ -1,4 +1,4 @@
--- [[ quatrojoke Script | Two-Panel Layout & ESP ]] --
+-- [[ quatrojoke Script | Fixed Intro Flow + Gun ESP + Dropped Gun Alert ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -7,7 +7,6 @@ local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
 
 local LocalPlayer = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
 
 -- Защита от повторного запуска
 if CoreGui:FindFirstChild("QuatrojokeUI") then
@@ -15,7 +14,7 @@ if CoreGui:FindFirstChild("QuatrojokeUI") then
 end
 
 -- ==========================================
--- SCREEN GUI & INTRO (4-14s)
+-- SCREEN GUI
 -- ==========================================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "QuatrojokeUI"
@@ -25,6 +24,119 @@ ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 pcall(function() ScreenGui.Parent = CoreGui end)
 if not ScreenGui.Parent then ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui") end
 
+-- ==========================================
+-- MAIN GUI FRAME (Hidden initially)
+-- ==========================================
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 560, 0, 420)
+MainFrame.Position = UDim2.new(0.5, -280, 0.5, -210)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+MainFrame.BackgroundTransparency = 1 -- Скрыто до конца интро
+MainFrame.BorderSizePixel = 0
+MainFrame.ClipsDescendants = true
+MainFrame.Visible = false
+MainFrame.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 10)
+MainCorner.Parent = MainFrame
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(255, 30, 60)
+MainStroke.Thickness = 2
+MainStroke.Transparency = 1
+MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+MainStroke.Parent = MainFrame
+
+-- Top Bar
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 40)
+TopBar.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
+TopBar.BackgroundTransparency = 1
+TopBar.BorderSizePixel = 0
+TopBar.Parent = MainFrame
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(0, 200, 1, 0)
+TitleLabel.Position = UDim2.new(0, 12, 0, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "quatrojoke <font color=\"#B4B4B4\">| MM2</font>"
+TitleLabel.RichText = true
+TitleLabel.Font = Enum.Font.FredokaOne
+TitleLabel.TextSize = 22
+TitleLabel.TextColor3 = Color3.fromRGB(255, 30, 60)
+TitleLabel.TextTransparency = 1
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.Parent = TopBar
+
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 28, 0, 28)
+CloseBtn.Position = UDim2.new(1, -34, 0, 6)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(35, 20, 25)
+CloseBtn.BackgroundTransparency = 1
+CloseBtn.Text = "✕"
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextColor3 = Color3.fromRGB(255, 60, 80)
+CloseBtn.TextTransparency = 1
+CloseBtn.TextSize = 13
+CloseBtn.Parent = TopBar
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 6)
+CloseCorner.Parent = CloseBtn
+
+CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
+
+-- Dragging
+local dragging, dragStart, startPos
+TopBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+    end
+end)
+TopBar.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Sidebar (Left)
+local SideBar = Instance.new("Frame")
+SideBar.Size = UDim2.new(0, 140, 1, -40)
+SideBar.Position = UDim2.new(0, 0, 0, 40)
+SideBar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+SideBar.BackgroundTransparency = 1
+SideBar.BorderSizePixel = 0
+SideBar.Parent = MainFrame
+
+local SideList = Instance.new("UIListLayout")
+SideList.Padding = UDim.new(0, 5)
+SideList.SortOrder = Enum.SortOrder.LayoutOrder
+SideList.Parent = SideBar
+
+local SidePadding = Instance.new("UIPadding")
+SidePadding.PaddingTop = UDim.new(0, 8)
+SidePadding.PaddingLeft = UDim.new(0, 8)
+SidePadding.PaddingRight = UDim.new(0, 8)
+SidePadding.Parent = SideBar
+
+-- Content Area (Right)
+local ContentArea = Instance.new("Frame")
+ContentArea.Size = UDim2.new(1, -140, 1, -40)
+ContentArea.Position = UDim2.new(0, 140, 0, 40)
+ContentArea.BackgroundTransparency = 1
+ContentArea.Parent = MainFrame
+
+-- ==========================================
+-- INTRO SYSTEM (GUI appears strictly AFTER intro)
+-- ==========================================
 local IntroFrame = Instance.new("Frame")
 IntroFrame.Name = "IntroFrame"
 IntroFrame.Size = UDim2.new(1, 0, 1, 0)
@@ -86,7 +198,7 @@ StatusLabel.Parent = IntroFrame
 
 math.randomseed(os.time())
 local loadTime = math.random(4, 14)
-local statuses = {"Загрузка интерфейса...", "Настройка вкладок...", "Настройка красного неона...", "Проверка ESP...", "Запуск quatrojoke..."}
+local statuses = {"Загрузка ресурсов...", "Настройка вкладок...", "Загрузка красного неона...", "Проверка Gun ESP...", "Запуск quatrojoke..."}
 
 task.spawn(function()
     local elapsed = 0
@@ -110,111 +222,65 @@ task.spawn(function()
     TweenService:Create(StatusLabel, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
     
     fadeTween:Play()
-    fadeTween.Completed:Connect(function() IntroFrame:Destroy() end)
+    fadeTween.Completed:Connect(function()
+        IntroFrame:Destroy()
+        
+        -- Показываем главное окно GUI только сейчас!
+        MainFrame.Visible = true
+        TweenService:Create(MainFrame, TweenInfo.new(0.4), {BackgroundTransparency = 0.15}):Play()
+        TweenService:Create(MainStroke, TweenInfo.new(0.4), {Transparency = 0}):Play()
+        TweenService:Create(TopBar, TweenInfo.new(0.4), {BackgroundTransparency = 0}):Play()
+        TweenService:Create(SideBar, TweenInfo.new(0.4), {BackgroundTransparency = 0}):Play()
+        TweenService:Create(TitleLabel, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
+        TweenService:Create(CloseBtn, TweenInfo.new(0.4), {BackgroundTransparency = 0, TextTransparency = 0}):Play()
+    end)
 end)
 
 -- ==========================================
--- MAIN GUI (SPLIT LAYOUT)
+-- DROPPED GUN NOTIFICATION (BOTTOM RIGHT)
 -- ==========================================
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 560, 0, 380)
-MainFrame.Position = UDim2.new(0.5, -280, 0.5, -190)
-MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
-MainFrame.BackgroundTransparency = 0.15
-MainFrame.BorderSizePixel = 0
-MainFrame.ClipsDescendants = true
-MainFrame.Parent = ScreenGui
+local GunAlertFrame = Instance.new("Frame")
+GunAlertFrame.Name = "GunAlertFrame"
+GunAlertFrame.Size = UDim2.new(0, 240, 0, 45)
+GunAlertFrame.Position = UDim2.new(1, 20, 1, -60) -- Позади экрана справа
+GunAlertFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
+GunAlertFrame.BorderSizePixel = 0
+GunAlertFrame.Parent = ScreenGui
 
-local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 10)
-MainCorner.Parent = MainFrame
+local AlertCorner = Instance.new("UICorner")
+AlertCorner.CornerRadius = UDim.new(0, 8)
+AlertCorner.Parent = GunAlertFrame
 
-local MainStroke = Instance.new("UIStroke")
-MainStroke.Color = Color3.fromRGB(255, 30, 60)
-MainStroke.Thickness = 2
-MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-MainStroke.Parent = MainFrame
+local AlertStroke = Instance.new("UIStroke")
+AlertStroke.Color = Color3.fromRGB(255, 200, 0) -- Ярко-желтый неон
+AlertStroke.Thickness = 2
+AlertStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+AlertStroke.Parent = GunAlertFrame
 
--- Top Bar
-local TopBar = Instance.new("Frame")
-TopBar.Size = UDim2.new(1, 0, 0, 40)
-TopBar.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
-TopBar.BorderSizePixel = 0
-TopBar.Parent = MainFrame
+local AlertText = Instance.new("TextLabel")
+AlertText.Size = UDim2.new(1, 0, 1, 0)
+AlertText.BackgroundTransparency = 1
+AlertText.Text = "⚠️ Пистолет на карте!"
+AlertText.Font = Enum.Font.GothamBold
+AlertText.TextSize = 14
+AlertText.TextColor3 = Color3.fromRGB(255, 220, 50)
+AlertText.Parent = GunAlertFrame
 
-local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Size = UDim2.new(0, 200, 1, 0)
-TitleLabel.Position = UDim2.new(0, 12, 0, 0)
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.Text = "quatrojoke <font color=\"#B4B4B4\">| MM2</font>"
-TitleLabel.RichText = true
-TitleLabel.Font = Enum.Font.FredokaOne
-TitleLabel.TextSize = 22
-TitleLabel.TextColor3 = Color3.fromRGB(255, 30, 60)
-TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-TitleLabel.Parent = TopBar
-
-local CloseBtn = Instance.new("TextButton")
-CloseBtn.Size = UDim2.new(0, 28, 0, 28)
-CloseBtn.Position = UDim2.new(1, -34, 0, 6)
-CloseBtn.BackgroundColor3 = Color3.fromRGB(35, 20, 25)
-CloseBtn.Text = "✕"
-CloseBtn.Font = Enum.Font.GothamBold
-CloseBtn.TextColor3 = Color3.fromRGB(255, 60, 80)
-CloseBtn.TextSize = 13
-CloseBtn.Parent = TopBar
-
-local CloseCorner = Instance.new("UICorner")
-CloseCorner.CornerRadius = UDim.new(0, 6)
-CloseCorner.Parent = CloseBtn
-
-CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
-
--- Dragging
-local dragging, dragStart, startPos
-TopBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-    end
-end)
-TopBar.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
--- Sidebar (Left)
-local SideBar = Instance.new("Frame")
-SideBar.Size = UDim2.new(0, 140, 1, -40)
-SideBar.Position = UDim2.new(0, 0, 0, 40)
-SideBar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
-SideBar.BorderSizePixel = 0
-SideBar.Parent = MainFrame
-
-local SideList = Instance.new("UIListLayout")
-SideList.Padding = UDim.new(0, 5)
-SideList.SortOrder = Enum.SortOrder.LayoutOrder
-SideList.Parent = SideBar
-
-local SidePadding = Instance.new("UIPadding")
-SidePadding.PaddingTop = UDim.new(0, 8)
-SidePadding.PaddingLeft = UDim.new(0, 8)
-SidePadding.PaddingRight = UDim.new(0, 8)
-SidePadding.Parent = SideBar
-
--- Content Area (Right)
-local ContentArea = Instance.new("Frame")
-ContentArea.Size = UDim2.new(1, -140, 1, -40)
-ContentArea.Position = UDim2.new(0, 140, 0, 40)
-ContentArea.BackgroundTransparency = 1
-ContentArea.Parent = MainFrame
+local alertActive = false
+local function ShowGunAlert()
+    if alertActive then return end
+    alertActive = true
+    
+    -- Плавный выезд справа
+    GunAlertFrame:TweenPosition(UDim2.new(1, -250, 1, -60), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.5, true)
+    
+    task.delay(4, function()
+        -- Плавный заезд обратно
+        GunAlertFrame:TweenPosition(UDim2.new(1, 20, 1, -60), Enum.EasingDirection.In, Enum.EasingStyle.Quart, 0.5, true, function()
+            alertActive = false
+        end)
+    end)
+end
 
 -- ==========================================
 -- ESP CONFIG DATA
@@ -222,10 +288,11 @@ ContentArea.Parent = MainFrame
 local ESP_Settings = {
     Innocent = { Enabled = false, Color = Color3.fromRGB(0, 255, 120), Transparency = 1 },
     Sheriff  = { Enabled = false, Color = Color3.fromRGB(0, 140, 255), Transparency = 1 },
-    Murder   = { Enabled = false, Color = Color3.fromRGB(255, 30, 60), Transparency = 1 }
+    Murder   = { Enabled = false, Color = Color3.fromRGB(255, 30, 60), Transparency = 1 },
+    Gun      = { Enabled = false, Color = Color3.fromRGB(255, 200, 0), Transparency = 1, AlertEnabled = false }
 }
 
--- Tab Button Creation
+-- Tab Button
 local TabBtn = Instance.new("TextButton")
 TabBtn.Size = UDim2.new(1, 0, 0, 36)
 TabBtn.BackgroundColor3 = Color3.fromRGB(45, 20, 30)
@@ -257,7 +324,6 @@ ContentList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     TabContent.CanvasSize = UDim2.new(0, 0, 0, ContentList.AbsoluteContentSize.Y + 10)
 end)
 
--- Preset Palette Colors
 local PaletteColors = {
     Color3.fromRGB(255, 30, 60),
     Color3.fromRGB(0, 255, 120),
@@ -267,8 +333,8 @@ local PaletteColors = {
     Color3.fromRGB(255, 255, 255)
 }
 
--- Helper: Create Role Section with Sub-menu
-local function CreateESPSection(roleKey, titleText)
+-- Helper: Create Role & Gun Section with Sub-menu
+local function CreateESPSection(roleKey, titleText, isGunSection)
     local sectionFrame = Instance.new("Frame")
     sectionFrame.Size = UDim2.new(1, -8, 0, 38)
     sectionFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
@@ -334,12 +400,12 @@ local function CreateESPSection(roleKey, titleText)
     
     -- Sub-Panel Container
     local subPanel = Instance.new("Frame")
-    subPanel.Size = UDim2.new(1, -20, 0, 110)
+    subPanel.Size = UDim2.new(1, -20, 0, isGunSection and 145 or 110)
     subPanel.Position = UDim2.new(0, 10, 0, 42)
     subPanel.BackgroundTransparency = 1
     subPanel.Parent = sectionFrame
     
-    -- Outline Color & Palette Label
+    -- Outline Color
     local colorLbl = Instance.new("TextLabel")
     colorLbl.Size = UDim2.new(1, 0, 0, 20)
     colorLbl.BackgroundTransparency = 1
@@ -350,7 +416,6 @@ local function CreateESPSection(roleKey, titleText)
     colorLbl.TextXAlignment = Enum.TextXAlignment.Left
     colorLbl.Parent = subPanel
     
-    -- Color Preview Box
     local colorPreview = Instance.new("Frame")
     colorPreview.Size = UDim2.new(0, 22, 0, 22)
     colorPreview.Position = UDim2.new(1, -22, 0, 0)
@@ -361,7 +426,7 @@ local function CreateESPSection(roleKey, titleText)
     prevCorner.CornerRadius = UDim.new(0, 4)
     prevCorner.Parent = colorPreview
     
-    -- Palette Grid
+    -- Palette
     local paletteFrame = Instance.new("Frame")
     paletteFrame.Size = UDim2.new(1, 0, 0, 26)
     paletteFrame.Position = UDim2.new(0, 0, 0, 24)
@@ -421,7 +486,6 @@ local function CreateESPSection(roleKey, titleText)
     sFillCorner.CornerRadius = UDim.new(1, 0)
     sFillCorner.Parent = sliderFill
     
-    -- Slider Logic
     local sliding = false
     local function UpdateSlider(input)
         local pos = math.clamp((input.Position.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0, 1)
@@ -432,23 +496,58 @@ local function CreateESPSection(roleKey, titleText)
     end
     
     sliderBg.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            sliding = true
-            UpdateSlider(input)
-        end
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then sliding = true UpdateSlider(input) end
     end)
-    
     UserInputService.InputChanged:Connect(function(input)
-        if sliding and input.UserInputType == Enum.UserInputType.MouseMovement then
-            UpdateSlider(input)
-        end
+        if sliding and input.UserInputType == Enum.UserInputType.MouseMovement then UpdateSlider(input) end
     end)
-    
     UserInputService.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then sliding = false end
     end)
     
-    -- Toggle Button Logic
+    -- Additional Option for Gun: Dropped Alert
+    if isGunSection then
+        local alertLbl = Instance.new("TextLabel")
+        alertLbl.Size = UDim2.new(0.7, 0, 0, 22)
+        alertLbl.Position = UDim2.new(0, 0, 0, 108)
+        alertLbl.BackgroundTransparency = 1
+        alertLbl.Text = "Сообщать что упал пистолет"
+        alertLbl.Font = Enum.Font.GothamMedium
+        alertLbl.TextSize = 12
+        alertLbl.TextColor3 = Color3.fromRGB(200, 200, 200)
+        alertLbl.TextXAlignment = Enum.TextXAlignment.Left
+        alertLbl.Parent = subPanel
+        
+        local alertBtn = Instance.new("TextButton")
+        alertBtn.Size = UDim2.new(0, 36, 0, 18)
+        alertBtn.Position = UDim2.new(1, -36, 0, 110)
+        alertBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+        alertBtn.Text = ""
+        alertBtn.Parent = subPanel
+        
+        local aCorner = Instance.new("UICorner")
+        aCorner.CornerRadius = UDim.new(1, 0)
+        aCorner.Parent = alertBtn
+        
+        local aDot = Instance.new("Frame")
+        aDot.Size = UDim2.new(0, 12, 0, 12)
+        aDot.Position = UDim2.new(0, 3, 0.5, -6)
+        aDot.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+        aDot.Parent = alertBtn
+        
+        local adCorner = Instance.new("UICorner")
+        adCorner.CornerRadius = UDim.new(1, 0)
+        adCorner.Parent = aDot
+        
+        alertBtn.MouseButton1Click:Connect(function()
+            ESP_Settings.Gun.AlertEnabled = not ESP_Settings.Gun.AlertEnabled
+            local st = ESP_Settings.Gun.AlertEnabled
+            TweenService:Create(alertBtn, TweenInfo.new(0.2), {BackgroundColor3 = st and Color3.fromRGB(255, 200, 0) or Color3.fromRGB(40, 40, 50)}):Play()
+            TweenService:Create(aDot, TweenInfo.new(0.2), {Position = st and UDim2.new(1, -15, 0.5, -6) or UDim2.new(0, 3, 0.5, -6), BackgroundColor3 = st and Color3.fromRGB(20, 20, 20) or Color3.fromRGB(150, 150, 150)}):Play()
+        end)
+    end
+    
+    -- Main Toggle Action
     toggleBtn.MouseButton1Click:Connect(function()
         ESP_Settings[roleKey].Enabled = not ESP_Settings[roleKey].Enabled
         local active = ESP_Settings[roleKey].Enabled
@@ -456,27 +555,28 @@ local function CreateESPSection(roleKey, titleText)
         TweenService:Create(togDot, TweenInfo.new(0.2), {Position = active and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8), BackgroundColor3 = active and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)}):Play()
     end)
     
-    -- Sub-Panel Expand/Collapse
+    -- Expand / Collapse
     local expanded = false
     expandBtn.MouseButton1Click:Connect(function()
         expanded = not expanded
         expandBtn.Text = expanded and "▲" or "▼"
         secStroke.Color = expanded and Color3.fromRGB(255, 30, 60) or Color3.fromRGB(45, 45, 55)
-        TweenService:Create(sectionFrame, TweenInfo.new(0.25), {Size = UDim2.new(1, -8, 0, expanded and 160 or 38)}):Play()
+        local targetHeight = expanded and (isGunSection and 195 or 160) or 38
+        TweenService:Create(sectionFrame, TweenInfo.new(0.25), {Size = UDim2.new(1, -8, 0, targetHeight)}):Play()
     end)
 end
 
 -- Create Sections
-CreateESPSection("Innocent", "Outline Innocent")
-CreateESPSection("Sheriff", "ESP Sheriff")
-CreateESPSection("Murder", "ESP Murder")
+CreateESPSection("Innocent", "Outline Innocent", false)
+CreateESPSection("Sheriff", "ESP Sheriff", false)
+CreateESPSection("Murder", "ESP Murder", false)
+CreateESPSection("Gun", "ESP Gun", true)
 
 -- ==========================================
--- MM2 AUTOMATIC ROLE ESP LOGIC
+-- MM2 PLAYER ROLE ESP LOGIC
 -- ==========================================
 local function GetPlayerRole(plr)
     if not plr or not plr.Character then return "Innocent" end
-    
     local backpack = plr:FindFirstChild("Backpack")
     local char = plr.Character
     
@@ -489,7 +589,25 @@ local function GetPlayerRole(plr)
     return "Innocent"
 end
 
+-- ==========================================
+-- DROPPED GUN SEARCH & HIGHLIGHT
+-- ==========================================
+local function FindDroppedGun()
+    -- Оружие на карте MM2 может лежать в workspace с именем GunDrop или в частях карты
+    for _, item in pairs(workspace:GetChildren()) do
+        if item:IsA("Tool") or item.Name == "GunDrop" or (item:IsA("Model") and item:FindFirstChild("Gun")) then
+            if item.Name == "GunDrop" or item:FindFirstChild("Gun") or item.Name == "Gun" then
+                return item
+            end
+        end
+    end
+    return nil
+end
+
+local gunWasOnMap = false
+
 RunService.RenderStepped:Connect(function()
+    -- 1. Player ESP
     for _, plr in pairs(Players:GetPlayers()) do
         if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
             local role = GetPlayerRole(plr)
@@ -503,13 +621,44 @@ RunService.RenderStepped:Connect(function()
                     hl.Parent = plr.Character
                 end
                 hl.Adornee = plr.Character
-                hl.FillTransparency = 1 -- Подсветка только контура (Outline)
+                hl.FillTransparency = 1
                 hl.OutlineColor = cfg.Color
                 hl.OutlineTransparency = 1 - cfg.Transparency
             else
                 if hl then hl:Destroy() end
             end
         end
+    end
+    
+    -- 2. Gun ESP & Alert Trigger
+    local droppedGun = FindDroppedGun()
+    
+    if droppedGun then
+        if not gunWasOnMap then
+            gunWasOnMap = true
+            if ESP_Settings.Gun.AlertEnabled then
+                ShowGunAlert()
+            end
+        end
+        
+        -- Gun ESP Highlight
+        local cfg = ESP_Settings.Gun
+        local hl = droppedGun:FindFirstChild("QuatroGunESP")
+        if cfg.Enabled and cfg.Transparency > 0 then
+            if not hl then
+                hl = Instance.new("Highlight")
+                hl.Name = "QuatroGunESP"
+                hl.Parent = droppedGun
+            end
+            hl.Adornee = droppedGun
+            hl.FillTransparency = 1
+            hl.OutlineColor = cfg.Color
+            hl.OutlineTransparency = 1 - cfg.Transparency
+        else
+            if hl then hl:Destroy() end
+        end
+    else
+        gunWasOnMap = false
     end
 end)
 
