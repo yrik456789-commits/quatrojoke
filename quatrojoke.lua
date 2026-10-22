@@ -1,4 +1,4 @@
--- [[ quatrojoke Script | Centered GUI-Sized Intro + MM2 ESP ]] --
+-- [[ quatrojoke Script | Optimized FPS Edition + Centered Intro + Gun ESP ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -172,7 +172,6 @@ IntroSub.TextSize = 16
 IntroSub.TextColor3 = Color3.fromRGB(200, 200, 200)
 IntroSub.Parent = IntroFrame
 
--- Progress Bar inside Intro
 local BarBg = Instance.new("Frame")
 BarBg.Size = UDim2.new(0, 380, 0, 8)
 BarBg.Position = UDim2.new(0.5, -190, 0.6, 0)
@@ -206,7 +205,7 @@ StatusLabel.Parent = IntroFrame
 
 math.randomseed(os.time())
 local loadTime = math.random(4, 14)
-local statuses = {"Загрузка ресурсов...", "Настройка вкладок...", "Загрузка красного неона...", "Проверка Gun ESP...", "Запуск quatrojoke..."}
+local statuses = {"Оптимизация FPS...", "Настройка вкладок...", "Загрузка красного неона...", "Проверка Gun ESP...", "Запуск quatrojoke..."}
 
 task.spawn(function()
     local elapsed = 0
@@ -222,7 +221,6 @@ task.spawn(function()
     StatusLabel.Text = "Готово!"
     task.wait(0.3)
     
-    -- Плавное исчезновение текста интро и показ GUI
     local fadeTween = TweenService:Create(IntroFrame, TweenInfo.new(0.5), {BackgroundTransparency = 1})
     TweenService:Create(IntroTitle, TweenInfo.new(0.4), {TextTransparency = 1, TextStrokeTransparency = 1}):Play()
     TweenService:Create(IntroSub, TweenInfo.new(0.4), {TextTransparency = 1}):Play()
@@ -331,7 +329,7 @@ local PaletteColors = {
     Color3.fromRGB(255, 255, 255)
 }
 
--- Helper: Create Role & Gun Section with Sub-menu
+-- Helper: Create Role & Gun Section
 local function CreateESPSection(roleKey, titleText, isGunSection)
     local sectionFrame = Instance.new("Frame")
     sectionFrame.Size = UDim2.new(1, -8, 0, 38)
@@ -562,7 +560,7 @@ CreateESPSection("Murder", "ESP Murder", false)
 CreateESPSection("Gun", "ESP Gun", true)
 
 -- ==========================================
--- MM2 PLAYER ROLE ESP LOGIC
+-- OPTIMIZED MM2 ROLE & GUN ESP SYSTEM
 -- ==========================================
 local function GetPlayerRole(plr)
     if not plr or not plr.Character then return "Innocent" end
@@ -578,12 +576,15 @@ local function GetPlayerRole(plr)
     return "Innocent"
 end
 
--- ==========================================
--- DROPPED GUN SEARCH
--- ==========================================
 local function GetDroppedGun()
+    for _, obj in pairs(workspace:GetChildren()) do
+        if obj.Name == "GunDrop" or (obj:IsA("Tool") and obj.Name == "Gun") then
+            return obj
+        end
+    end
+    -- Запасной поиск во вложенных папках
     for _, obj in pairs(workspace:GetDescendants()) do
-        if obj.Name == "GunDrop" or (obj:IsA("Tool") and obj.Name == "Gun" and not obj:IsDescendantOf(Players)) then
+        if obj.Name == "GunDrop" then
             return obj
         end
     end
@@ -592,57 +593,62 @@ end
 
 local gunWasOnMap = false
 
-RunService.RenderStepped:Connect(function()
-    -- 1. Player ESP
-    for _, plr in pairs(Players:GetPlayers()) do
-        if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-            local role = GetPlayerRole(plr)
-            local cfg = ESP_Settings[role]
+-- Throttle-цикл (выполняется 10 раз в секунду вместо 60-140)
+task.spawn(function()
+    while task.wait(0.1) do
+        if not ScreenGui.Parent then break end
+        
+        -- 1. Player ESP Update
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                local role = GetPlayerRole(plr)
+                local cfg = ESP_Settings[role]
+                
+                local hl = plr.Character:FindFirstChild("QuatroESP")
+                if cfg and cfg.Enabled and cfg.Transparency > 0 then
+                    if not hl then
+                        hl = Instance.new("Highlight")
+                        hl.Name = "QuatroESP"
+                        hl.Parent = plr.Character
+                    end
+                    hl.Adornee = plr.Character
+                    hl.FillTransparency = 1
+                    hl.OutlineColor = cfg.Color
+                    hl.OutlineTransparency = 1 - cfg.Transparency
+                else
+                    if hl then hl:Destroy() end
+                end
+            end
+        end
+        
+        -- 2. Gun ESP & Alert Update
+        local droppedGun = GetDroppedGun()
+        if droppedGun then
+            if not gunWasOnMap then
+                gunWasOnMap = true
+                if ESP_Settings.Gun.AlertEnabled then
+                    ShowGunAlert()
+                end
+            end
             
-            local hl = plr.Character:FindFirstChild("QuatroESP")
-            if cfg and cfg.Enabled and cfg.Transparency > 0 then
+            local cfg = ESP_Settings.Gun
+            local hl = droppedGun:FindFirstChild("QuatroGunESP")
+            if cfg.Enabled and cfg.Transparency > 0 then
                 if not hl then
                     hl = Instance.new("Highlight")
-                    hl.Name = "QuatroESP"
-                    hl.Parent = plr.Character
+                    hl.Name = "QuatroGunESP"
+                    hl.Parent = droppedGun
                 end
-                hl.Adornee = plr.Character
+                hl.Adornee = droppedGun
                 hl.FillTransparency = 1
                 hl.OutlineColor = cfg.Color
                 hl.OutlineTransparency = 1 - cfg.Transparency
             else
                 if hl then hl:Destroy() end
             end
-        end
-    end
-    
-    -- 2. Gun ESP & Alert
-    local droppedGun = GetDroppedGun()
-    if droppedGun then
-        if not gunWasOnMap then
-            gunWasOnMap = true
-            if ESP_Settings.Gun.AlertEnabled then
-                ShowGunAlert()
-            end
-        end
-        
-        local cfg = ESP_Settings.Gun
-        local hl = droppedGun:FindFirstChild("QuatroGunESP")
-        if cfg.Enabled and cfg.Transparency > 0 then
-            if not hl then
-                hl = Instance.new("Highlight")
-                hl.Name = "QuatroGunESP"
-                hl.Parent = droppedGun
-            end
-            hl.Adornee = droppedGun
-            hl.FillTransparency = 1
-            hl.OutlineColor = cfg.Color
-            hl.OutlineTransparency = 1 - cfg.Transparency
         else
-            if hl then hl:Destroy() end
+            gunWasOnMap = false
         end
-    else
-        gunWasOnMap = false
     end
 end)
 
