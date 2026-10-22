@@ -1,4 +1,4 @@
--- [[ quatrojoke Script | Fixed Intro Flow + Gun ESP + Dropped Gun Alert ]] --
+-- [[ quatrojoke Script | Centered GUI-Sized Intro + MM2 ESP ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -25,14 +25,14 @@ pcall(function() ScreenGui.Parent = CoreGui end)
 if not ScreenGui.Parent then ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui") end
 
 -- ==========================================
--- MAIN GUI FRAME (Hidden initially)
+-- MAIN GUI FRAME
 -- ==========================================
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 560, 0, 420)
 MainFrame.Position = UDim2.new(0.5, -280, 0.5, -210)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
-MainFrame.BackgroundTransparency = 1 -- Скрыто до конца интро
+MainFrame.BackgroundTransparency = 0.15
 MainFrame.BorderSizePixel = 0
 MainFrame.ClipsDescendants = true
 MainFrame.Visible = false
@@ -45,7 +45,6 @@ MainCorner.Parent = MainFrame
 local MainStroke = Instance.new("UIStroke")
 MainStroke.Color = Color3.fromRGB(255, 30, 60)
 MainStroke.Thickness = 2
-MainStroke.Transparency = 1
 MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 MainStroke.Parent = MainFrame
 
@@ -53,7 +52,6 @@ MainStroke.Parent = MainFrame
 local TopBar = Instance.new("Frame")
 TopBar.Size = UDim2.new(1, 0, 0, 40)
 TopBar.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
-TopBar.BackgroundTransparency = 1
 TopBar.BorderSizePixel = 0
 TopBar.Parent = MainFrame
 
@@ -66,7 +64,6 @@ TitleLabel.RichText = true
 TitleLabel.Font = Enum.Font.FredokaOne
 TitleLabel.TextSize = 22
 TitleLabel.TextColor3 = Color3.fromRGB(255, 30, 60)
-TitleLabel.TextTransparency = 1
 TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 TitleLabel.Parent = TopBar
 
@@ -74,11 +71,9 @@ local CloseBtn = Instance.new("TextButton")
 CloseBtn.Size = UDim2.new(0, 28, 0, 28)
 CloseBtn.Position = UDim2.new(1, -34, 0, 6)
 CloseBtn.BackgroundColor3 = Color3.fromRGB(35, 20, 25)
-CloseBtn.BackgroundTransparency = 1
 CloseBtn.Text = "✕"
 CloseBtn.Font = Enum.Font.GothamBold
 CloseBtn.TextColor3 = Color3.fromRGB(255, 60, 80)
-CloseBtn.TextTransparency = 1
 CloseBtn.TextSize = 13
 CloseBtn.Parent = TopBar
 
@@ -88,7 +83,7 @@ CloseCorner.Parent = CloseBtn
 
 CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
 
--- Dragging
+-- Dragging Logic
 local dragging, dragStart, startPos
 TopBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -112,7 +107,6 @@ local SideBar = Instance.new("Frame")
 SideBar.Size = UDim2.new(0, 140, 1, -40)
 SideBar.Position = UDim2.new(0, 0, 0, 40)
 SideBar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
-SideBar.BackgroundTransparency = 1
 SideBar.BorderSizePixel = 0
 SideBar.Parent = MainFrame
 
@@ -135,40 +129,54 @@ ContentArea.BackgroundTransparency = 1
 ContentArea.Parent = MainFrame
 
 -- ==========================================
--- INTRO SYSTEM (GUI appears strictly AFTER intro)
+-- INTRO FRAME (GUI Size: 560x420 Centered)
 -- ==========================================
 local IntroFrame = Instance.new("Frame")
 IntroFrame.Name = "IntroFrame"
-IntroFrame.Size = UDim2.new(1, 0, 1, 0)
-IntroFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
+IntroFrame.Size = UDim2.new(0, 560, 0, 420)
+IntroFrame.Position = UDim2.new(0.5, -280, 0.5, -210)
+IntroFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+IntroFrame.BackgroundTransparency = 0.05
+IntroFrame.ClipsDescendants = true
 IntroFrame.Parent = ScreenGui
 
+local IntroCorner = Instance.new("UICorner")
+IntroCorner.CornerRadius = UDim.new(0, 10)
+IntroCorner.Parent = IntroFrame
+
+local IntroStroke = Instance.new("UIStroke")
+IntroStroke.Color = Color3.fromRGB(255, 30, 60)
+IntroStroke.Thickness = 2
+IntroStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+IntroStroke.Parent = IntroFrame
+
 local IntroTitle = Instance.new("TextLabel")
-IntroTitle.Size = UDim2.new(0, 500, 0, 80)
-IntroTitle.Position = UDim2.new(0.5, -250, 0.4, -40)
+IntroTitle.Size = UDim2.new(1, 0, 0, 60)
+IntroTitle.Position = UDim2.new(0, 0, 0.3, -30)
 IntroTitle.BackgroundTransparency = 1
 IntroTitle.Text = "quatrojoke"
 IntroTitle.Font = Enum.Font.FredokaOne
-IntroTitle.TextSize = 65
+IntroTitle.TextSize = 52
 IntroTitle.TextColor3 = Color3.fromRGB(255, 30, 60)
 IntroTitle.TextStrokeTransparency = 0.2
 IntroTitle.TextStrokeColor3 = Color3.fromRGB(150, 0, 30)
 IntroTitle.Parent = IntroFrame
 
 local IntroSub = Instance.new("TextLabel")
-IntroSub.Size = UDim2.new(0, 400, 0, 30)
-IntroSub.Position = UDim2.new(0.5, -200, 0.4, 45)
+IntroSub.Size = UDim2.new(1, 0, 0, 25)
+IntroSub.Position = UDim2.new(0, 0, 0.3, 30)
 IntroSub.BackgroundTransparency = 1
 IntroSub.Text = "Murder Mystery 2 Edition"
 IntroSub.Font = Enum.Font.GothamMedium
-IntroSub.TextSize = 18
+IntroSub.TextSize = 16
 IntroSub.TextColor3 = Color3.fromRGB(200, 200, 200)
 IntroSub.Parent = IntroFrame
 
+-- Progress Bar inside Intro
 local BarBg = Instance.new("Frame")
-BarBg.Size = UDim2.new(0, 350, 0, 8)
-BarBg.Position = UDim2.new(0.5, -175, 0.55, 0)
-BarBg.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+BarBg.Size = UDim2.new(0, 380, 0, 8)
+BarBg.Position = UDim2.new(0.5, -190, 0.6, 0)
+BarBg.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
 BarBg.BorderSizePixel = 0
 BarBg.Parent = IntroFrame
 
@@ -187,12 +195,12 @@ FillCorner.CornerRadius = UDim.new(1, 0)
 FillCorner.Parent = BarFill
 
 local StatusLabel = Instance.new("TextLabel")
-StatusLabel.Size = UDim2.new(0, 350, 0, 25)
-StatusLabel.Position = UDim2.new(0.5, -175, 0.55, 12)
+StatusLabel.Size = UDim2.new(1, 0, 0, 25)
+StatusLabel.Position = UDim2.new(0, 0, 0.6, 12)
 StatusLabel.BackgroundTransparency = 1
 StatusLabel.Text = "Инициализация..."
 StatusLabel.Font = Enum.Font.Gotham
-StatusLabel.TextSize = 14
+StatusLabel.TextSize = 13
 StatusLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
 StatusLabel.Parent = IntroFrame
 
@@ -212,37 +220,31 @@ task.spawn(function()
     end
     
     StatusLabel.Text = "Готово!"
-    task.wait(0.4)
+    task.wait(0.3)
     
-    local fadeTween = TweenService:Create(IntroFrame, TweenInfo.new(0.6), {BackgroundTransparency = 1})
-    TweenService:Create(IntroTitle, TweenInfo.new(0.5), {TextTransparency = 1, TextStrokeTransparency = 1}):Play()
-    TweenService:Create(IntroSub, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
-    TweenService:Create(BarBg, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
-    TweenService:Create(BarFill, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
-    TweenService:Create(StatusLabel, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
+    -- Плавное исчезновение текста интро и показ GUI
+    local fadeTween = TweenService:Create(IntroFrame, TweenInfo.new(0.5), {BackgroundTransparency = 1})
+    TweenService:Create(IntroTitle, TweenInfo.new(0.4), {TextTransparency = 1, TextStrokeTransparency = 1}):Play()
+    TweenService:Create(IntroSub, TweenInfo.new(0.4), {TextTransparency = 1}):Play()
+    TweenService:Create(BarBg, TweenInfo.new(0.4), {BackgroundTransparency = 1}):Play()
+    TweenService:Create(BarFill, TweenInfo.new(0.4), {BackgroundTransparency = 1}):Play()
+    TweenService:Create(StatusLabel, TweenInfo.new(0.4), {TextTransparency = 1}):Play()
+    TweenService:Create(IntroStroke, TweenInfo.new(0.4), {Transparency = 1}):Play()
     
     fadeTween:Play()
     fadeTween.Completed:Connect(function()
         IntroFrame:Destroy()
-        
-        -- Показываем главное окно GUI только сейчас!
         MainFrame.Visible = true
-        TweenService:Create(MainFrame, TweenInfo.new(0.4), {BackgroundTransparency = 0.15}):Play()
-        TweenService:Create(MainStroke, TweenInfo.new(0.4), {Transparency = 0}):Play()
-        TweenService:Create(TopBar, TweenInfo.new(0.4), {BackgroundTransparency = 0}):Play()
-        TweenService:Create(SideBar, TweenInfo.new(0.4), {BackgroundTransparency = 0}):Play()
-        TweenService:Create(TitleLabel, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
-        TweenService:Create(CloseBtn, TweenInfo.new(0.4), {BackgroundTransparency = 0, TextTransparency = 0}):Play()
     end)
 end)
 
 -- ==========================================
--- DROPPED GUN NOTIFICATION (BOTTOM RIGHT)
+-- DROPPED GUN NOTIFICATION
 -- ==========================================
 local GunAlertFrame = Instance.new("Frame")
 GunAlertFrame.Name = "GunAlertFrame"
 GunAlertFrame.Size = UDim2.new(0, 240, 0, 45)
-GunAlertFrame.Position = UDim2.new(1, 20, 1, -60) -- Позади экрана справа
+GunAlertFrame.Position = UDim2.new(1, 20, 1, -60)
 GunAlertFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
 GunAlertFrame.BorderSizePixel = 0
 GunAlertFrame.Parent = ScreenGui
@@ -252,7 +254,7 @@ AlertCorner.CornerRadius = UDim.new(0, 8)
 AlertCorner.Parent = GunAlertFrame
 
 local AlertStroke = Instance.new("UIStroke")
-AlertStroke.Color = Color3.fromRGB(255, 200, 0) -- Ярко-желтый неон
+AlertStroke.Color = Color3.fromRGB(255, 200, 0)
 AlertStroke.Thickness = 2
 AlertStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 AlertStroke.Parent = GunAlertFrame
@@ -270,12 +272,8 @@ local alertActive = false
 local function ShowGunAlert()
     if alertActive then return end
     alertActive = true
-    
-    -- Плавный выезд справа
     GunAlertFrame:TweenPosition(UDim2.new(1, -250, 1, -60), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.5, true)
-    
     task.delay(4, function()
-        -- Плавный заезд обратно
         GunAlertFrame:TweenPosition(UDim2.new(1, 20, 1, -60), Enum.EasingDirection.In, Enum.EasingStyle.Quart, 0.5, true, function()
             alertActive = false
         end)
@@ -350,7 +348,6 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
     secStroke.Thickness = 1
     secStroke.Parent = sectionFrame
     
-    -- Main Toggle Bar
     local topToggle = Instance.new("Frame")
     topToggle.Size = UDim2.new(1, 0, 0, 38)
     topToggle.BackgroundTransparency = 1
@@ -398,14 +395,12 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
     expandBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
     expandBtn.Parent = topToggle
     
-    -- Sub-Panel Container
     local subPanel = Instance.new("Frame")
     subPanel.Size = UDim2.new(1, -20, 0, isGunSection and 145 or 110)
     subPanel.Position = UDim2.new(0, 10, 0, 42)
     subPanel.BackgroundTransparency = 1
     subPanel.Parent = sectionFrame
     
-    -- Outline Color
     local colorLbl = Instance.new("TextLabel")
     colorLbl.Size = UDim2.new(1, 0, 0, 20)
     colorLbl.BackgroundTransparency = 1
@@ -426,7 +421,6 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
     prevCorner.CornerRadius = UDim.new(0, 4)
     prevCorner.Parent = colorPreview
     
-    -- Palette
     local paletteFrame = Instance.new("Frame")
     paletteFrame.Size = UDim2.new(1, 0, 0, 26)
     paletteFrame.Position = UDim2.new(0, 0, 0, 24)
@@ -455,7 +449,6 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
         end)
     end
     
-    -- Transparency Slider
     local transLbl = Instance.new("TextLabel")
     transLbl.Size = UDim2.new(1, 0, 0, 20)
     transLbl.Position = UDim2.new(0, 0, 0, 56)
@@ -505,7 +498,6 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then sliding = false end
     end)
     
-    -- Additional Option for Gun: Dropped Alert
     if isGunSection then
         local alertLbl = Instance.new("TextLabel")
         alertLbl.Size = UDim2.new(0.7, 0, 0, 22)
@@ -547,7 +539,6 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
         end)
     end
     
-    -- Main Toggle Action
     toggleBtn.MouseButton1Click:Connect(function()
         ESP_Settings[roleKey].Enabled = not ESP_Settings[roleKey].Enabled
         local active = ESP_Settings[roleKey].Enabled
@@ -555,7 +546,6 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
         TweenService:Create(togDot, TweenInfo.new(0.2), {Position = active and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8), BackgroundColor3 = active and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)}):Play()
     end)
     
-    -- Expand / Collapse
     local expanded = false
     expandBtn.MouseButton1Click:Connect(function()
         expanded = not expanded
@@ -566,7 +556,6 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
     end)
 end
 
--- Create Sections
 CreateESPSection("Innocent", "Outline Innocent", false)
 CreateESPSection("Sheriff", "ESP Sheriff", false)
 CreateESPSection("Murder", "ESP Murder", false)
@@ -590,15 +579,12 @@ local function GetPlayerRole(plr)
 end
 
 -- ==========================================
--- DROPPED GUN SEARCH & HIGHLIGHT
+-- DROPPED GUN SEARCH
 -- ==========================================
-local function FindDroppedGun()
-    -- Оружие на карте MM2 может лежать в workspace с именем GunDrop или в частях карты
-    for _, item in pairs(workspace:GetChildren()) do
-        if item:IsA("Tool") or item.Name == "GunDrop" or (item:IsA("Model") and item:FindFirstChild("Gun")) then
-            if item.Name == "GunDrop" or item:FindFirstChild("Gun") or item.Name == "Gun" then
-                return item
-            end
+local function GetDroppedGun()
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj.Name == "GunDrop" or (obj:IsA("Tool") and obj.Name == "Gun" and not obj:IsDescendantOf(Players)) then
+            return obj
         end
     end
     return nil
@@ -630,9 +616,8 @@ RunService.RenderStepped:Connect(function()
         end
     end
     
-    -- 2. Gun ESP & Alert Trigger
-    local droppedGun = FindDroppedGun()
-    
+    -- 2. Gun ESP & Alert
+    local droppedGun = GetDroppedGun()
     if droppedGun then
         if not gunWasOnMap then
             gunWasOnMap = true
@@ -641,7 +626,6 @@ RunService.RenderStepped:Connect(function()
             end
         end
         
-        -- Gun ESP Highlight
         local cfg = ESP_Settings.Gun
         local hl = droppedGun:FindFirstChild("QuatroGunESP")
         if cfg.Enabled and cfg.Transparency > 0 then
