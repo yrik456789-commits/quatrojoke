@@ -1,4 +1,4 @@
--- [[ quatrojoke Script | Sounds Tab & 3D Box ESP Edition ]] --
+-- [[ quatrojoke Script | Fling, Demon Arms & ESP Gun Fix Edition ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -37,12 +37,12 @@ FXContainer.Name = "QuatroFXContainer"
 FXContainer.Parent = Workspace
 
 -- ==========================================
--- MAIN FRAME (Volumetric High-End UI)
+-- MAIN FRAME (Volumetric Design)
 -- ==========================================
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 600, 0, 460)
-MainFrame.Position = UDim2.new(0.5, -300, 0.5, -230)
+MainFrame.Size = UDim2.new(0, 620, 0, 470)
+MainFrame.Position = UDim2.new(0.5, -310, 0.5, -235)
 MainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 16)
 MainFrame.BackgroundTransparency = 0.05
 MainFrame.BorderSizePixel = 0
@@ -53,22 +53,15 @@ MainFrame.Parent = ScreenGui
 local MainCorner = Instance.new("UICorner") MainCorner.CornerRadius = UDim.new(0, 12) MainCorner.Parent = MainFrame
 local MainStroke = Instance.new("UIStroke") MainStroke.Color = Color3.fromRGB(255, 40, 70) MainStroke.Thickness = 2.5 MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border MainStroke.Parent = MainFrame
 
--- Top Bar with Glassmorphism gradient
+-- Top Bar
 local TopBar = Instance.new("Frame")
 TopBar.Size = UDim2.new(1, 0, 0, 44)
 TopBar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
 TopBar.BorderSizePixel = 0
 TopBar.Parent = MainFrame
 
-local TopGradient = Instance.new("UIGradient")
-TopGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(35, 20, 30)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(18, 18, 24))
-})
-TopGradient.Parent = TopBar
-
 local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Size = UDim2.new(0, 220, 1, 0)
+TitleLabel.Size = UDim2.new(0, 240, 1, 0)
 TitleLabel.Position = UDim2.new(0, 16, 0, 0)
 TitleLabel.BackgroundTransparency = 1
 TitleLabel.Text = "quatrojoke <font color=\"#8C8C9E\">| MM2 Suite</font>"
@@ -138,8 +131,8 @@ ContentArea.Parent = MainFrame
 -- ==========================================
 local IntroFrame = Instance.new("Frame")
 IntroFrame.Name = "IntroFrame"
-IntroFrame.Size = UDim2.new(0, 600, 0, 460)
-IntroFrame.Position = UDim2.new(0.5, -300, 0.5, -230)
+IntroFrame.Size = UDim2.new(0, 620, 0, 470)
+IntroFrame.Position = UDim2.new(0.5, -310, 0.5, -235)
 IntroFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 14)
 IntroFrame.BackgroundTransparency = 0.05
 IntroFrame.ClipsDescendants = true
@@ -185,15 +178,15 @@ local StatusLabel = Instance.new("TextLabel")
 StatusLabel.Size = UDim2.new(1, 0, 0, 25)
 StatusLabel.Position = UDim2.new(0, 0, 0.6, 12)
 StatusLabel.BackgroundTransparency = 1
-StatusLabel.Text = "Инициализация модулей..."
+StatusLabel.Text = "Инициализация системы..."
 StatusLabel.Font = Enum.Font.Gotham
 StatusLabel.TextSize = 13
 StatusLabel.TextColor3 = Color3.fromRGB(140, 140, 150)
 StatusLabel.Parent = IntroFrame
 
 math.randomseed(os.time())
-local loadTime = math.random(4, 14)
-local statuses = {"Загрузка системы звуков...", "Настройка объёмных 3D боксов...", "Оптимизация трейсеров...", "Запуск quatrojoke..."}
+local loadTime = math.random(4, 12)
+local statuses = {"Калибровка Fling модуля...", "Настройка Demon Arms...", "Фикс трейсеров и 3D боксов...", "Запуск quatrojoke..."}
 
 task.spawn(function()
     local elapsed = 0
@@ -203,7 +196,7 @@ task.spawn(function()
         local progress = math.clamp(elapsed / loadTime, 0, 1)
         BarFill.Size = UDim2.new(progress, 0, 1, 0)
         local statusIndex = math.clamp(math.floor(progress * #statuses) + 1, 1, #statuses)
-        StatusLabel.Text = statuses[statusIndex] .. " (" .. math.floor(progress * 100)  .. "%)"
+        StatusLabel.Text = statuses[statusIndex] .. " (" .. math.floor(progress * 100) .. "%)"
     end
     
     StatusLabel.Text = "Готово!"
@@ -281,11 +274,13 @@ local Config = {
     },
     Aura = { Enabled = false, Color = Color3.fromRGB(255, 40, 70), Transparency = 0.8 },
     Angel = { Enabled = false, Color = Color3.fromRGB(255, 255, 255), Transparency = 0.8 },
+    DemonArms = { Enabled = false, Color = Color3.fromRGB(230, 160, 120), Transparency = 0.9 }, -- Руки из спины
     Sounds = {
-        Shoot = { Enabled = false, SoundId = "rbxassetid://9064292110" }, -- Custom gunshot / Hitmarker
-        Kill = { Enabled = false, SoundId = "rbxassetid://4590657391" },   -- Bell / Impact
-        MurderKill = { Enabled = false, SoundId = "rbxassetid://6026985010" } -- Epic sound
+        Shoot = { Enabled = false, SoundId = "rbxassetid://9064292110" },
+        Kill = { Enabled = false, SoundId = "rbxassetid://4590657391" },
+        MurderKill = { Enabled = false, SoundId = "rbxassetid://6026985010" }
     },
+    AntiFling = { Enabled = false },
     Movement = {
         Fly = { Enabled = false, Speed = 50, BatmanAnim = false },
         Spin = { Enabled = false, Speed = 20 },
@@ -293,7 +288,11 @@ local Config = {
     }
 }
 
--- Sound Database Options
+local SelectedFlingTarget = nil
+
+-- ==========================================
+-- SOUND DATABASE & PLAYER
+-- ==========================================
 local SoundOptions = {
     {Name = "Hitmarker / Sharp", Id = "rbxassetid://9064292110"},
     {Name = "Bell / Impact", Id = "rbxassetid://4590657391"},
@@ -301,11 +300,10 @@ local SoundOptions = {
     {Name = "Classic Pop", Id = "rbxassetid://131498877"}
 }
 
--- Play Custom Sound Over Original
 local function PlayCustomSound(soundId)
     local s = Instance.new("Sound")
     s.SoundId = soundId
-    s.Volume = 2.0
+    s.Volume = 2.5
     s.Parent = SoundService
     s:Play()
     s.Ended:Connect(function() s:Destroy() end)
@@ -366,15 +364,16 @@ end
 
 local TabVisuals = CreateTab("Visuals / ESP")
 local TabSounds = CreateTab("Sounds")
+local TabFling = CreateTab("Fling")
 local TabFX = CreateTab("Visual Effects")
 local TabMove = CreateTab("Movement")
 
 local PaletteColors = {
     Color3.fromRGB(255, 255, 255),
     Color3.fromRGB(255, 40, 70),
+    Color3.fromRGB(230, 160, 120),
     Color3.fromRGB(0, 255, 120),
     Color3.fromRGB(0, 140, 255),
-    Color3.fromRGB(255, 200, 0),
     Color3.fromRGB(180, 0, 255)
 }
 
@@ -606,13 +605,13 @@ CreateSection(TabVisuals, Config.Boxes.Murder, "3D Box Murder")
 -- Sounds Tab
 CreateHeader(TabSounds, "CUSTOM SOUND MANAGER")
 CreateSection(TabSounds, Config.Sounds.Shoot, "Shoot Sound (Выстрел)", {
-    Color = false, Transparency = false, ExpandedHeight = 110,
+    Color = false, Transparency = false, ExpandedHeight = 160,
     CustomSub = function(panel, y)
         local currLbl = Instance.new("TextLabel")
         currLbl.Size = UDim2.new(1, 0, 0, 20)
         currLbl.Position = UDim2.new(0, 0, 0, y)
         currLbl.BackgroundTransparency = 1
-        currLbl.Text = "Выберите звук выстрела:"
+        currLbl.Text = "Выберите звук выстрела из списка:"
         currLbl.Font = Enum.Font.Gotham
         currLbl.TextSize = 12
         currLbl.TextColor3 = Color3.fromRGB(160, 160, 175)
@@ -624,7 +623,7 @@ CreateSection(TabSounds, Config.Sounds.Shoot, "Shoot Sound (Выстрел)", {
             local sBtn = Instance.new("TextButton")
             sBtn.Size = UDim2.new(1, 0, 0, 26)
             sBtn.Position = UDim2.new(0, 0, 0, btnY)
-            sBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+            sBtn.BackgroundColor3 = (Config.Sounds.Shoot.SoundId == snd.Id) and Color3.fromRGB(50, 20, 35) or Color3.fromRGB(25, 25, 35)
             sBtn.Text = snd.Name
             sBtn.Font = Enum.Font.GothamMedium
             sBtn.TextSize = 12
@@ -634,9 +633,10 @@ CreateSection(TabSounds, Config.Sounds.Shoot, "Shoot Sound (Выстрел)", {
             
             sBtn.MouseButton1Click:Connect(function()
                 Config.Sounds.Shoot.SoundId = snd.Id
+                for _, child in pairs(panel:GetChildren()) do
+                    if child:IsA("TextButton") then child.BackgroundColor3 = Color3.fromRGB(25, 25, 35) end
+                end
                 sBtn.BackgroundColor3 = Color3.fromRGB(50, 20, 35)
-                task.wait(0.3)
-                sBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
             end)
             btnY = btnY + 30
         end
@@ -644,7 +644,7 @@ CreateSection(TabSounds, Config.Sounds.Shoot, "Shoot Sound (Выстрел)", {
 })
 
 CreateSection(TabSounds, Config.Sounds.Kill, "Kill Sound (Убийство)", {
-    Color = false, Transparency = false, ExpandedHeight = 110,
+    Color = false, Transparency = false, ExpandedHeight = 160,
     CustomSub = function(panel, y)
         local currLbl = Instance.new("TextLabel")
         currLbl.Size = UDim2.new(1, 0, 0, 20)
@@ -662,7 +662,7 @@ CreateSection(TabSounds, Config.Sounds.Kill, "Kill Sound (Убийство)", {
             local sBtn = Instance.new("TextButton")
             sBtn.Size = UDim2.new(1, 0, 0, 26)
             sBtn.Position = UDim2.new(0, 0, 0, btnY)
-            sBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+            sBtn.BackgroundColor3 = (Config.Sounds.Kill.SoundId == snd.Id) and Color3.fromRGB(50, 20, 35) or Color3.fromRGB(25, 25, 35)
             sBtn.Text = snd.Name
             sBtn.Font = Enum.Font.GothamMedium
             sBtn.TextSize = 12
@@ -672,9 +672,10 @@ CreateSection(TabSounds, Config.Sounds.Kill, "Kill Sound (Убийство)", {
             
             sBtn.MouseButton1Click:Connect(function()
                 Config.Sounds.Kill.SoundId = snd.Id
+                for _, child in pairs(panel:GetChildren()) do
+                    if child:IsA("TextButton") then child.BackgroundColor3 = Color3.fromRGB(25, 25, 35) end
+                end
                 sBtn.BackgroundColor3 = Color3.fromRGB(50, 20, 35)
-                task.wait(0.3)
-                sBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
             end)
             btnY = btnY + 30
         end
@@ -682,13 +683,13 @@ CreateSection(TabSounds, Config.Sounds.Kill, "Kill Sound (Убийство)", {
 })
 
 CreateSection(TabSounds, Config.Sounds.MurderKill, "Kill Sound (Murder)", {
-    Color = false, Transparency = false, ExpandedHeight = 110,
+    Color = false, Transparency = false, ExpandedHeight = 160,
     CustomSub = function(panel, y)
         local currLbl = Instance.new("TextLabel")
         currLbl.Size = UDim2.new(1, 0, 0, 20)
         currLbl.Position = UDim2.new(0, 0, 0, y)
         currLbl.BackgroundTransparency = 1
-        currLbl.Text = "Выберите звук убийства за Мурдера:"
+        currLbl.Text = "Выберите звук за Мурдера:"
         currLbl.Font = Enum.Font.Gotham
         currLbl.TextSize = 12
         currLbl.TextColor3 = Color3.fromRGB(160, 160, 175)
@@ -700,7 +701,7 @@ CreateSection(TabSounds, Config.Sounds.MurderKill, "Kill Sound (Murder)", {
             local sBtn = Instance.new("TextButton")
             sBtn.Size = UDim2.new(1, 0, 0, 26)
             sBtn.Position = UDim2.new(0, 0, 0, btnY)
-            sBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+            sBtn.BackgroundColor3 = (Config.Sounds.MurderKill.SoundId == snd.Id) and Color3.fromRGB(50, 20, 35) or Color3.fromRGB(25, 25, 35)
             sBtn.Text = snd.Name
             sBtn.Font = Enum.Font.GothamMedium
             sBtn.TextSize = 12
@@ -710,19 +711,106 @@ CreateSection(TabSounds, Config.Sounds.MurderKill, "Kill Sound (Murder)", {
             
             sBtn.MouseButton1Click:Connect(function()
                 Config.Sounds.MurderKill.SoundId = snd.Id
+                for _, child in pairs(panel:GetChildren()) do
+                    if child:IsA("TextButton") then child.BackgroundColor3 = Color3.fromRGB(25, 25, 35) end
+                end
                 sBtn.BackgroundColor3 = Color3.fromRGB(50, 20, 35)
-                task.wait(0.3)
-                sBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
             end)
             btnY = btnY + 30
         end
     end
 })
 
+-- Populate Fling Tab
+CreateHeader(TabFling, "FLING PLAYERS")
+
+local PlayerListFrame = Instance.new("ScrollingFrame")
+PlayerListFrame.Size = UDim2.new(1, -8, 0, 180)
+PlayerListFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+PlayerListFrame.ScrollBarThickness = 4
+PlayerListFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 40, 70)
+PlayerListFrame.Parent = TabFling
+
+local pListCorner = Instance.new("UICorner") pListCorner.CornerRadius = UDim.new(0, 8) pListCorner.Parent = PlayerListFrame
+local pListLayout = Instance.new("UIListLayout") pListLayout.Padding = UDim.new(0, 4) pListLayout.Parent = PlayerListFrame
+
+local function RefreshPlayerList()
+    PlayerListFrame:ClearAllChildren()
+    local layout = Instance.new("UIListLayout") layout.Padding = UDim.new(0, 4) layout.Parent = PlayerListFrame
+    
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            local pBtn = Instance.new("TextButton")
+            pBtn.Size = UDim2.new(1, -8, 0, 28)
+            pBtn.BackgroundColor3 = (SelectedFlingTarget == plr) and Color3.fromRGB(50, 20, 35) or Color3.fromRGB(25, 25, 35)
+            pBtn.Text = plr.DisplayName .. " (@" .. plr.Name .. ")"
+            pBtn.Font = Enum.Font.GothamMedium
+            pBtn.TextSize = 12
+            pBtn.TextColor3 = Color3.fromRGB(220, 220, 230)
+            pBtn.Parent = PlayerListFrame
+            
+            local c = Instance.new("UICorner") c.CornerRadius = UDim.new(0, 6) c.Parent = pBtn
+            
+            pBtn.MouseButton1Click:Connect(function()
+                SelectedFlingTarget = plr
+                RefreshPlayerList()
+            end)
+        end
+    end
+    PlayerListFrame.CanvasSize = UDim2.new(0, 0, 0, #Players:GetPlayers() * 32)
+end
+
+RefreshPlayerList()
+Players.PlayerAdded:Connect(RefreshPlayerList)
+Players.PlayerRemoving:Connect(RefreshPlayerList)
+
+local FlingActionBtn = Instance.new("TextButton")
+FlingActionBtn.Size = UDim2.new(1, -8, 0, 36)
+FlingActionBtn.BackgroundColor3 = Color3.fromRGB(255, 40, 70)
+FlingActionBtn.Text = "⚡ ВЫПОЛНИТЬ FLING (РВАНИНА)"
+FlingActionBtn.Font = Enum.Font.GothamBold
+FlingActionBtn.TextSize = 13
+FlingActionBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+FlingActionBtn.Parent = TabFling
+
+local faCorner = Instance.new("UICorner") faCorner.CornerRadius = UDim.new(0, 8) faCorner.Parent = FlingActionBtn
+
+FlingActionBtn.MouseButton1Click:Connect(function()
+    if SelectedFlingTarget and SelectedFlingTarget.Character and SelectedFlingTarget.Character:FindFirstChild("HumanoidRootPart") then
+        local targetHrp = SelectedFlingTarget.Character.HumanoidRootPart
+        local myChar = LocalPlayer.Character
+        local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+        
+        if myHrp then
+            task.spawn(function()
+                local bV = Instance.new("BodyAngularVelocity")
+                bV.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
+                bV.AngularVelocity = Vector3.new(99999, 99999, 99999)
+                bV.Parent = myHrp
+                
+                for i = 1, 40 do
+                    if not targetHrp or not targetHrp.Parent then break end
+                    myHrp.CFrame = targetHrp.CFrame * CFrame.new(0, 0, 0)
+                    task.wait(0.02)
+                end
+                bV:Destroy()
+            end)
+        end
+    end
+end)
+
+CreateHeader(TabFling, "ANTI FLING PROTECTION")
+CreateSection(TabFling, Config.AntiFling, "Anti Fling (Защита от рванины)", {Color = false, Transparency = false, ExpandedHeight = 40})
+
 -- Visual Effects Tab
 CreateHeader(TabFX, "EFFECTS & AURA")
 CreateSection(TabFX, Config.Aura, "Player Aura Effect")
 CreateSection(TabFX, Config.Angel, "3D Volumetric Angel Wings")
+
+-- Demon Arms (Руки из спины как на фото)
+CreateSection(TabFX, Config.DemonArms, "Demon Arms (Вторые руки)", {
+    ExpandedHeight = 170
+})
 
 -- Movement Tab
 CreateHeader(TabMove, "MOVEMENT MODES")
@@ -838,7 +926,7 @@ CreateSection(TabMove, Config.Movement.Spin, "Spin (Вращение)", {
 CreateSection(TabMove, Config.Movement.Noclip, "Noclip (Сквозь стены)", {Color = false, Transparency = false, ExpandedHeight = 40})
 
 -- ==========================================
--- ENGINE ARCHITECTURE & 3D BOX ESP
+-- ENGINE ARCHITECTURE, DEMON ARMS & 3D BOXES
 -- ==========================================
 local function GetPlayerRole(plr)
     if not plr or not plr.Character then return "Innocent" end
@@ -851,9 +939,12 @@ local function GetPlayerRole(plr)
     return "Innocent"
 end
 
+-- Fix ESP Gun search (Поиск пистолета во всех папках)
 local function GetDroppedGun()
-    for _, obj in pairs(Workspace:GetChildren()) do
-        if obj.Name == "GunDrop" or (obj:IsA("Tool") and obj.Name == "Gun") then return obj end
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        if obj.Name == "GunDrop" or (obj:IsA("Tool") and (obj.Name == "Gun" or obj.Name == "Revolver")) then
+            if not obj:IsDescendantOf(Players) then return obj end
+        end
     end
     return nil
 end
@@ -899,23 +990,27 @@ for side = -1, 1, 2 do
     end
 end
 
--- Intercept sound events for custom audio over originals
-LocalPlayer.CharacterAdded:Connect(function(char)
-    char.ChildAdded:Connect(function(tool)
-        if tool:IsA("Tool") then
-            tool.Activated:Connect(function()
-                if Config.Sounds.Shoot.Enabled then
-                    PlayCustomSound(Config.Sounds.Shoot.SoundId)
-                end
-            end)
-        end
-    end)
-end)
+-- Create Demon Arms (Клешни за спиной по фото)
+local demonArmsParts = {}
+for side = -1, 1, 2 do
+    local armUpper = Instance.new("Part")
+    armUpper.Size = Vector3.new(0.5, 1.8, 0.5)
+    armUpper.CanCollide = false armUpper.Anchored = true armUpper.Material = Enum.Material.SmoothPlastic armUpper.Transparency = 1 armUpper.Parent = FXContainer
+    
+    local armClaw = Instance.new("Part")
+    armClaw.Size = Vector3.new(0.6, 0.8, 0.6)
+    armClaw.CanCollide = false armClaw.Anchored = true armClaw.Material = Enum.Material.SmoothPlastic armClaw.Transparency = 1 armClaw.Parent = FXContainer
+    
+    local cMesh = Instance.new("SpecialMesh") cMesh.MeshType = Enum.MeshType.FileMesh cMesh.MeshId = "rbxassetid://430325425" cMesh.Scale = Vector3.new(0.6, 0.6, 0.6) cMesh.Parent = armClaw
+    
+    table.insert(demonArmsParts, {Upper = armUpper, Claw = armClaw, Side = side})
+end
 
-if LocalPlayer.Character then
-    LocalPlayer.Character.ChildAdded:Connect(function(tool)
-        if tool:IsA("Tool") then
-            tool.Activated:Connect(function()
+-- Detect actual network gunshots for sounds (Not mouse click)
+local function ConnectGunShotSound(char)
+    char.ChildAdded:Connect(function(child)
+        if child:IsA("Tool") and (child.Name == "Gun" or child.Name == "Revolver") then
+            child.Activated:Connect(function()
                 if Config.Sounds.Shoot.Enabled then
                     PlayCustomSound(Config.Sounds.Shoot.SoundId)
                 end
@@ -924,46 +1019,13 @@ if LocalPlayer.Character then
     end)
 end
 
--- Track player deaths for Kill Sounds
-for _, plr in pairs(Players:GetPlayers()) do
-    if plr ~= LocalPlayer then
-        plr.CharacterAdded:Connect(function(char)
-            local hum = char:WaitForChild("Humanoid", 5)
-            if hum then
-                hum.Died:Connect(function()
-                    local myRole = GetPlayerRole(LocalPlayer)
-                    if myRole == "Murder" and Config.Sounds.MurderKill.Enabled then
-                        PlayCustomSound(Config.Sounds.MurderKill.SoundId)
-                    elseif Config.Sounds.Kill.Enabled then
-                        PlayCustomSound(Config.Sounds.Kill.SoundId)
-                    end
-                end)
-            end
-        end)
-    end
-end
+if LocalPlayer.Character then ConnectGunShotSound(LocalPlayer.Character) end
+LocalPlayer.CharacterAdded:Connect(ConnectGunShotSound)
 
-Players.PlayerAdded:Connect(function(plr)
-    plr.CharacterAdded:Connect(function(char)
-        local hum = char:WaitForChild("Humanoid", 5)
-        if hum then
-            hum.Died:Connect(function()
-                local myRole = GetPlayerRole(LocalPlayer)
-                if myRole == "Murder" and Config.Sounds.MurderKill.Enabled then
-                    PlayCustomSound(Config.Sounds.MurderKill.SoundId)
-                elseif Config.Sounds.Kill.Enabled then
-                    PlayCustomSound(Config.Sounds.Kill.SoundId)
-                end
-            end)
-        end
-    end)
-end)
-
--- ==========================================
 -- MAIN ENGINE LOOP
--- ==========================================
 local auraAngle = 0
 local wingFlap = 0
+local armBob = 0
 
 local bodyVel = Instance.new("BodyVelocity") bodyVel.MaxForce = Vector3.new(0, 0, 0)
 local bodyGyro = Instance.new("BodyGyro") bodyGyro.MaxTorque = Vector3.new(0, 0, 0)
@@ -973,7 +1035,23 @@ RunService.RenderStepped:Connect(function()
     local hrp = char and char:FindFirstChild("HumanoidRootPart")
     local hum = char and char:FindFirstChild("Humanoid")
     
-    -- 1. Fly System
+    -- Anti-Fling Engine
+    if Config.AntiFling.Enabled and hrp then
+        for _, v in pairs(Workspace:GetChildren()) do
+            if v:IsA("Model") and v ~= char and v:FindFirstChild("HumanoidRootPart") then
+                local oHrp = v.HumanoidRootPart
+                if (oHrp.Position - hrp.Position).Magnitude < 8 then
+                    if oHrp.Velocity.Magnitude > 80 or oHrp.RotVelocity.Magnitude > 80 then
+                        for _, p in pairs(char:GetDescendants()) do
+                            if p:IsA("BasePart") then p.CanCollide = false end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    -- Fly
     if Config.Movement.Fly.Enabled and hrp and hum then
         bodyVel.Parent = hrp
         bodyGyro.Parent = hrp
@@ -997,7 +1075,7 @@ RunService.RenderStepped:Connect(function()
         if hum and not Config.Movement.Fly.Enabled then hum.PlatformStand = false end
     end
     
-    -- 2. Spiral Aura
+    -- Spiral Aura
     local cfgA = Config.Aura
     if cfgA.Enabled and hrp then
         auraAngle = auraAngle + 0.05
@@ -1015,7 +1093,7 @@ RunService.RenderStepped:Connect(function()
         for _, bar in ipairs(auraBars) do bar.Transparency = 1 end
     end
     
-    -- 3. Angel Wings
+    -- Angel Wings
     local cfgW = Config.Angel
     if cfgW.Enabled and hrp then
         local isMoving = (hum and hum.MoveDirection.Magnitude > 0) or Config.Movement.Fly.Enabled
@@ -1045,29 +1123,54 @@ RunService.RenderStepped:Connect(function()
         for _, fData in ipairs(wing3DFeathers) do fData.Part.Transparency = 1 end
     end
     
-    -- 4. Spin
+    -- Demon Arms (Smooth Bobbing & Smooth Emerge)[cite: 3]
+    local cfgDA = Config.DemonArms
+    if cfgDA.Enabled and hrp then
+        armBob = armBob + 0.04
+        local bobY = math.sin(armBob) * 0.2
+        
+        for _, arm in ipairs(demonArmsParts) do
+            local side = arm.Side
+            local targetUpperCF = hrp.CFrame * CFrame.new(side * 1.8, 0.6 + bobY, 0.8) * CFrame.Angles(math.rad(20), 0, side * math.rad(-30))
+            local targetClawCF = targetUpperCF * CFrame.new(0, 1.1, -0.4) * CFrame.Angles(math.rad(45), 0, 0)
+            
+            arm.Upper.CFrame = arm.Upper.CFrame:Lerp(targetUpperCF, 0.2)
+            arm.Claw.CFrame = arm.Claw.CFrame:Lerp(targetClawCF, 0.2)
+            
+            arm.Upper.Color = cfgDA.Color
+            arm.Claw.Color = cfgDA.Color
+            arm.Upper.Transparency = 1 - cfgDA.Transparency
+            arm.Claw.Transparency = 1 - cfgDA.Transparency
+        end
+    else
+        for _, arm in ipairs(demonArmsParts) do
+            arm.Upper.Transparency = 1
+            arm.Claw.Transparency = 1
+        end
+    end
+    
+    -- Spin
     if Config.Movement.Spin.Enabled and hrp then
         hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(Config.Movement.Spin.Speed), 0)
     end
     
-    -- 5. Noclip
+    -- Noclip
     if Config.Movement.Noclip.Enabled and char then
         for _, v in pairs(char:GetDescendants()) do
             if v:IsA("BasePart") then v.CanCollide = false end
         end
     end
     
-    -- 6. Clean Tracers & 3D Box ESP Rendering
+    -- Perfect Tracers & Static Ground 3D Boxes
     DrawingCanvas:ClearAllChildren()
     for _, plr in pairs(Players:GetPlayers()) do
         if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
             local role = GetPlayerRole(plr)
             local p_hrp = plr.Character.HumanoidRootPart
-            local p_head = plr.Character:FindFirstChild("Head") or p_hrp
-            local pos, onScreen = Camera:WorldToViewportPoint(p_hrp.Position)
+            local pos, onScreen = Camera:WorldToScreenPoint(p_hrp.Position)
             
             if onScreen then
-                -- Tracers Fix (Stable anchor at bottom screen center)
+                -- Tracers Fix
                 local cfgT = Config.Tracers[role]
                 if cfgT and cfgT.Enabled and cfgT.Transparency > 0 then
                     local line = Instance.new("Frame")
@@ -1085,12 +1188,13 @@ RunService.RenderStepped:Connect(function()
                     line.Parent = DrawingCanvas
                 end
                 
-                -- Beautiful 3D Box ESP
+                -- Perfect 3D Box ESP (Does not slide down when walking away)
                 local cfgB = Config.Boxes[role]
                 if cfgB and cfgB.Enabled and cfgB.Transparency > 0 then
-                    local headPos = Camera:WorldToViewportPoint(p_head.Position + Vector3.new(0, 1, 0))
-                    local legPos = Camera:WorldToViewportPoint(p_hrp.Position - Vector3.new(0, 3, 0))
-                    local height = math.abs(headPos.Y - legPos.Y)
+                    local cSize = plr.Character:GetExtentsSize()
+                    local topCF = Camera:WorldToScreenPoint(p_hrp.Position + Vector3.new(0, cSize.Y / 2, 0))
+                    local botCF = Camera:WorldToScreenPoint(p_hrp.Position - Vector3.new(0, cSize.Y / 2, 0))
+                    local height = math.abs(topCF.Y - botCF.Y)
                     local width = height / 1.5
                     
                     local box = Instance.new("Frame")
