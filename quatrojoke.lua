@@ -1,4 +1,4 @@
--- [[ quatrojoke Script | Visuals Deluxe Edition (Tracers, Boxes, Aura) ]] --
+-- [[ quatrojoke Script | Fixed Animated Aura + Full Visuals ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -31,6 +31,11 @@ DrawingCanvas.Name = "DrawingCanvas"
 DrawingCanvas.Size = UDim2.new(1, 0, 1, 0)
 DrawingCanvas.BackgroundTransparency = 1
 DrawingCanvas.Parent = ScreenGui
+
+-- Container for Animated Aura Particles
+local AuraContainer = Instance.new("Folder")
+AuraContainer.Name = "QuatroAuraContainer"
+AuraContainer.Parent = workspace
 
 -- ==========================================
 -- MAIN GUI FRAME
@@ -89,7 +94,10 @@ local CloseCorner = Instance.new("UICorner")
 CloseCorner.CornerRadius = UDim.new(0, 6)
 CloseCorner.Parent = CloseBtn
 
-CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
+CloseBtn.MouseButton1Click:Connect(function() 
+    AuraContainer:Destroy()
+    ScreenGui:Destroy() 
+end)
 
 -- Dragging
 local dragging, dragStart, startPos
@@ -213,7 +221,7 @@ StatusLabel.Parent = IntroFrame
 
 math.randomseed(os.time())
 local loadTime = math.random(4, 14)
-local statuses = {"Загрузка Visuals...", "Настройка Tracers & Boxes...", "Подготовка эффекта Aura...", "Оптимизация кадров...", "Запуск quatrojoke..."}
+local statuses = {"Исправление Aura...", "Загрузка 3D-анимаций...", "Настройка неона...", "Оптимизация...", "Запуск quatrojoke..."}
 
 task.spawn(function()
     local elapsed = 0
@@ -287,7 +295,7 @@ local function ShowGunAlert()
 end
 
 -- ==========================================
--- FULL CONFIG DATA
+-- CONFIG
 -- ==========================================
 local Config = {
     Outlines = {
@@ -306,7 +314,7 @@ local Config = {
         Sheriff  = { Enabled = false, Color = Color3.fromRGB(0, 140, 255), Transparency = 1 },
         Murder   = { Enabled = false, Color = Color3.fromRGB(255, 30, 60), Transparency = 1 }
     },
-    Aura = { Enabled = false, Color = Color3.fromRGB(180, 0, 255), Transparency = 0.5, Neon = false }
+    Aura = { Enabled = false, Color = Color3.fromRGB(255, 30, 60), Transparency = 0.8, Neon = true }
 }
 
 -- Tab Button
@@ -415,7 +423,7 @@ local function CreateSubSection(cfgRef, titleText, isGun, isAura)
     expandBtn.Parent = topToggle
     
     local subPanel = Instance.new("Frame")
-    subPanel.Size = UDim2.new(1, -20, 0, isGun and 145 or (isAura and 145 or 110))
+    subPanel.Size = UDim2.new(1, -20, 0, (isGun or isAura) and 145 or 110)
     subPanel.Position = UDim2.new(0, 10, 0, 42)
     subPanel.BackgroundTransparency = 1
     subPanel.Parent = sectionFrame
@@ -571,7 +579,7 @@ local function CreateSubSection(cfgRef, titleText, isGun, isAura)
         local neonBtn = Instance.new("TextButton")
         neonBtn.Size = UDim2.new(0, 36, 0, 18)
         neonBtn.Position = UDim2.new(1, -36, 0, 110)
-        neonBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+        neonBtn.BackgroundColor3 = cfgRef.Neon and Color3.fromRGB(255, 30, 60) or Color3.fromRGB(40, 40, 50)
         neonBtn.Text = ""
         neonBtn.Parent = subPanel
         
@@ -581,8 +589,8 @@ local function CreateSubSection(cfgRef, titleText, isGun, isAura)
         
         local nDot = Instance.new("Frame")
         nDot.Size = UDim2.new(0, 12, 0, 12)
-        nDot.Position = UDim2.new(0, 3, 0.5, -6)
-        nDot.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+        nDot.Position = cfgRef.Neon and UDim2.new(1, -15, 0.5, -6) or UDim2.new(0, 3, 0.5, -6)
+        nDot.BackgroundColor3 = cfgRef.Neon and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
         nDot.Parent = neonBtn
         
         local ndCorner = Instance.new("UICorner")
@@ -592,7 +600,7 @@ local function CreateSubSection(cfgRef, titleText, isGun, isAura)
         neonBtn.MouseButton1Click:Connect(function()
             cfgRef.Neon = not cfgRef.Neon
             local st = cfgRef.Neon
-            TweenService:Create(neonBtn, TweenInfo.new(0.2), {BackgroundColor3 = st and Color3.fromRGB(180, 0, 255) or Color3.fromRGB(40, 40, 50)}):Play()
+            TweenService:Create(neonBtn, TweenInfo.new(0.2), {BackgroundColor3 = st and Color3.fromRGB(255, 30, 60) or Color3.fromRGB(40, 40, 50)}):Play()
             TweenService:Create(nDot, TweenInfo.new(0.2), {Position = st and UDim2.new(1, -15, 0.5, -6) or UDim2.new(0, 3, 0.5, -6), BackgroundColor3 = st and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)}):Play()
         end)
     end
@@ -614,7 +622,7 @@ local function CreateSubSection(cfgRef, titleText, isGun, isAura)
     end)
 end
 
--- Category Titles
+-- Category Headers
 local function CreateHeader(text)
     local lbl = Instance.new("TextLabel")
     lbl.Size = UDim2.new(1, 0, 0, 20)
@@ -626,7 +634,6 @@ local function CreateHeader(text)
     lbl.Parent = TabContent
 end
 
--- Create Sections
 CreateHeader("OUTLINES")
 CreateSubSection(Config.Outlines.Innocent, "Outline Innocent", false, false)
 CreateSubSection(Config.Outlines.Sheriff, "ESP Sheriff", false, false)
@@ -647,7 +654,7 @@ CreateHeader("EFFECTS")
 CreateSubSection(Config.Aura, "Player Aura Effect", false, true)
 
 -- ==========================================
--- LOGIC & VISUAL RENDER LOOPS
+-- LOGIC & ANIMATED 6-BAR AURA
 -- ==========================================
 local function GetPlayerRole(plr)
     if not plr or not plr.Character then return "Innocent" end
@@ -672,113 +679,59 @@ local function GetDroppedGun()
     return nil
 end
 
-local TracerGUIElements = {}
-local BoxGUIElements = {}
-
--- Clean GUI Elements
-local function ClearDrawings()
-    DrawingCanvas:ClearAllChildren()
-    TracerGUIElements = {}
-    BoxGUIElements = {}
+-- Create 6 Floating Aura Bars (No Collision / No Physics Bug)
+local auraBars = {}
+for i = 1, 6 do
+    local bar = Instance.new("Part")
+    bar.Name = "AuraBar_" .. i
+    bar.Size = Vector3.new(0.3, 2.2, 0.3) -- Средний размер
+    bar.CanCollide = false
+    bar.CanQuery = false
+    bar.CanTouch = false
+    bar.Anchored = true
+    bar.Material = Enum.Material.Neon
+    bar.Transparency = 1
+    bar.Parent = AuraContainer
+    table.insert(auraBars, bar)
 end
 
--- Throttle Loop (Outlines, Gun Alert & Aura) - 10 times/sec
-local gunWasOnMap = false
-task.spawn(function()
-    while task.wait(0.1) do
-        if not ScreenGui.Parent then break end
+local auraAngle = 0
+
+-- RenderStepped Loop for Smooth Aura Animation (X and Y Axis Movement)
+RunService.RenderStepped:Connect(function()
+    -- 1. Animated Aura
+    local cfgA = Config.Aura
+    if cfgA.Enabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local hrp = LocalPlayer.Character.HumanoidRootPart
+        auraAngle = auraAngle + 0.04 -- Скорость вращения
         
-        -- Outlines & Aura
-        for _, plr in pairs(Players:GetPlayers()) do
-            if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                local role = GetPlayerRole(plr)
-                
-                -- Outlines
-                local cfgO = Config.Outlines[role]
-                local hl = plr.Character:FindFirstChild("QuatroESP")
-                if cfgO and cfgO.Enabled and cfgO.Transparency > 0 then
-                    if not hl then
-                        hl = Instance.new("Highlight")
-                        hl.Name = "QuatroESP"
-                        hl.Parent = plr.Character
-                    end
-                    hl.Adornee = plr.Character
-                    hl.FillTransparency = 1
-                    hl.OutlineColor = cfgO.Color
-                    hl.OutlineTransparency = 1 - cfgO.Transparency
-                else
-                    if hl then hl:Destroy() end
-                end
-                
-                -- Aura Effect
-                local cfgA = Config.Aura
-                local auraP = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("QuatroAura")
-                if cfgA.Enabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                    if not auraP then
-                        local part = Instance.new("Part")
-                        part.Name = "QuatroAura"
-                        part.Shape = Enum.PartType.Ball
-                        part.Size = Vector3.new(8, 8, 8)
-                        part.CanCollide = false
-                        part.Anchored = false
-                        part.Material = cfgA.Neon and Enum.Material.Neon or Enum.Material.SmoothPlastic
-                        
-                        local weld = Instance.new("Weld")
-                        weld.Part0 = LocalPlayer.Character.HumanoidRootPart
-                        weld.Part1 = part
-                        weld.Parent = part
-                        
-                        part.Parent = LocalPlayer.Character
-                        auraP = part
-                    end
-                    auraP.Color = cfgA.Color
-                    auraP.Transparency = 1 - cfgA.Transparency
-                    auraP.Material = cfgA.Neon and Enum.Material.Neon or Enum.Material.SmoothPlastic
-                else
-                    if auraP then auraP:Destroy() end
-                end
-            end
-        end
-        
-        -- Gun ESP & Alert
-        local droppedGun = GetDroppedGun()
-        if droppedGun then
-            if not gunWasOnMap then
-                gunWasOnMap = true
-                if Config.Outlines.Gun.AlertEnabled then ShowGunAlert() end
-            end
+        for i, bar in ipairs(auraBars) do
+            local offsetAngle = auraAngle + (i * (math.pi / 3))
+            local radius = 3.5
             
-            local cfgG = Config.Outlines.Gun
-            local hlG = droppedGun:FindFirstChild("QuatroGunESP")
-            if cfgG.Enabled and cfgG.Transparency > 0 then
-                if not hlG then
-                    hlG = Instance.new("Highlight")
-                    hlG.Name = "QuatroGunESP"
-                    hlG.Parent = droppedGun
-                end
-                hlG.Adornee = droppedGun
-                hlG.FillTransparency = 1
-                hlG.OutlineColor = cfgG.Color
-                hlG.OutlineTransparency = 1 - cfgG.Transparency
-            else
-                if hlG then hlG:Destroy() end
-            end
-        else
-            gunWasOnMap = false
+            -- Движение по осям X, Y и Z
+            local x = math.cos(offsetAngle) * radius
+            local z = math.sin(offsetAngle) * radius
+            local y = math.sin(offsetAngle * 2) * 1.2 -- Плавный подъём и спуск по оси Y
+            
+            bar.CFrame = CFrame.new(hrp.Position + Vector3.new(x, y, z)) * CFrame.Angles(offsetAngle, offsetAngle * 0.5, 0)
+            bar.Color = cfgA.Color
+            bar.Transparency = 1 - cfgA.Transparency
+            bar.Material = cfgA.Neon and Enum.Material.Neon or Enum.Material.SmoothPlastic
+        end
+    else
+        for _, bar in ipairs(auraBars) do
+            bar.Transparency = 1
         end
     end
-end)
 
--- RenderStepped for Tracers & Boxes (Smooth Drawing)
-RunService.RenderStepped:Connect(function()
-    ClearDrawings()
-    
+    -- 2. Tracers & Boxes Canvas Render
+    DrawingCanvas:ClearAllChildren()
     for _, plr in pairs(Players:GetPlayers()) do
         if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
             local role = GetPlayerRole(plr)
             local hrp = plr.Character.HumanoidRootPart
             local head = plr.Character:FindFirstChild("Head") or hrp
-            
             local pos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
             
             if onScreen then
@@ -824,6 +777,62 @@ RunService.RenderStepped:Connect(function()
                     stroke.Parent = box
                 end
             end
+        end
+    end
+end)
+
+-- Throttle Loop for Player & Gun Outlines (10 times/sec)
+local gunWasOnMap = false
+task.spawn(function()
+    while task.wait(0.1) do
+        if not ScreenGui.Parent then break end
+        
+        -- Player Outlines
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                local role = GetPlayerRole(plr)
+                local cfgO = Config.Outlines[role]
+                local hl = plr.Character:FindFirstChild("QuatroESP")
+                if cfgO and cfgO.Enabled and cfgO.Transparency > 0 then
+                    if not hl then
+                        hl = Instance.new("Highlight")
+                        hl.Name = "QuatroESP"
+                        hl.Parent = plr.Character
+                    end
+                    hl.Adornee = plr.Character
+                    hl.FillTransparency = 1
+                    hl.OutlineColor = cfgO.Color
+                    hl.OutlineTransparency = 1 - cfgO.Transparency
+                else
+                    if hl then hl:Destroy() end
+                end
+            end
+        end
+        
+        -- Gun Outlines & Alert
+        local droppedGun = GetDroppedGun()
+        if droppedGun then
+            if not gunWasOnMap then
+                gunWasOnMap = true
+                if Config.Outlines.Gun.AlertEnabled then ShowGunAlert() end
+            end
+            local cfgG = Config.Outlines.Gun
+            local hlG = droppedGun:FindFirstChild("QuatroGunESP")
+            if cfgG.Enabled and cfgG.Transparency > 0 then
+                if not hlG then
+                    hlG = Instance.new("Highlight")
+                    hlG.Name = "QuatroGunESP"
+                    hlG.Parent = droppedGun
+                end
+                hlG.Adornee = droppedGun
+                hlG.FillTransparency = 1
+                hlG.OutlineColor = cfgG.Color
+                hlG.OutlineTransparency = 1 - cfgG.Transparency
+            else
+                if hlG me then hlG:Destroy() end
+            end
+        else
+            gunWasOnMap = false
         end
     end
 end)
