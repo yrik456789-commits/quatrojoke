@@ -1,4 +1,4 @@
--- [[ quatrojoke Script | Tung Tung Sahur Update ]] --
+-- [[ quatrojoke Script | Tung Tung Sahur Playable Model Update ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -185,7 +185,7 @@ StatusLabel.Parent = IntroFrame
 
 math.randomseed(os.time())
 local loadTime = math.random(4, 14)
-local statuses = {"Загрузка Tung Tung Sahur...", "Скрытие оригинального тела...", "Подключение анимации...", "Запуск quatrojoke..."}
+local statuses = {"Калибровка роста Tung Tung Sahur...", "Настройка движений...", "Подключение механики...", "Запуск quatrojoke..."}
 
 task.spawn(function()
     local elapsed = 0
@@ -273,7 +273,7 @@ local Config = {
     },
     Aura = { Enabled = false, Color = Color3.fromRGB(255, 30, 60), Transparency = 0.8 },
     Angel = { Enabled = false, Color = Color3.fromRGB(255, 255, 255), Transparency = 0.8 },
-    TungTung = { Enabled = false }, -- Функция Tung Tung Sahur
+    TungTung = { Enabled = false },
     Movement = {
         Fly = { Enabled = false, Speed = 50, BatmanAnim = false },
         Spin = { Enabled = false, Speed = 20 },
@@ -690,7 +690,7 @@ CreateSection(TabMove, Config.Movement.Spin, "Spin (Вращение)", {
 CreateSection(TabMove, Config.Movement.Noclip, "Noclip (Сквозь стены)", {Color = false, Transparency = false, ExpandedHeight = 40})
 
 -- ==========================================
--- TUNG TUNG SAHUR MODEL & EFFECTS ARCHITECTURE
+-- PLAYABLE TUNG TUNG SAHUR ARCHITECTURE
 -- ==========================================
 local function GetPlayerRole(plr)
     if not plr or not plr.Character then return "Innocent" end
@@ -751,15 +751,15 @@ for side = -1, 1, 2 do
     end
 end
 
--- Create Custom Tung Tung Sahur Model
+-- Create Proportional Tung Tung Sahur Model
 local tungModel = Instance.new("Model")
 tungModel.Name = "TungTungSahurModel"
 
 local woodColor = Color3.fromRGB(180, 115, 60)
 
--- Main Wooden Pillar Body
+-- Main Pillar Body
 local tungBody = Instance.new("Part")
-tungBody.Size = Vector3.new(1.6, 4.2, 1.2)
+tungBody.Size = Vector3.new(1.4, 3.8, 1.1)
 tungBody.Color = woodColor
 tungBody.Material = Enum.Material.Wood
 tungBody.CanCollide = false
@@ -773,7 +773,7 @@ bodyMesh.Parent = tungBody
 
 -- Head Cap
 local tungHead = Instance.new("Part")
-tungHead.Size = Vector3.new(1.6, 0.6, 1.2)
+tungHead.Size = Vector3.new(1.4, 0.5, 1.1)
 tungHead.Color = Color3.fromRGB(150, 90, 45)
 tungHead.Material = Enum.Material.Wood
 tungHead.CanCollide = false
@@ -782,13 +782,13 @@ tungHead.Parent = tungModel
 
 -- Eyes
 local eyeL = Instance.new("Part")
-eyeL.Size = Vector3.new(0.4, 0.4, 0.1)
+eyeL.Size = Vector3.new(0.35, 0.35, 0.1)
 eyeL.Color = Color3.fromRGB(255, 255, 255)
 eyeL.Material = Enum.Material.SmoothPlastic
 eyeL.CanCollide = false eyeL.Anchored = true eyeL.Parent = tungModel
 
 local pupilL = Instance.new("Part")
-pupilL.Size = Vector3.new(0.2, 0.2, 0.12)
+pupilL.Size = Vector3.new(0.18, 0.18, 0.12)
 pupilL.Color = Color3.fromRGB(10, 10, 10)
 pupilL.Material = Enum.Material.SmoothPlastic
 pupilL.CanCollide = false pupilL.Anchored = true pupilL.Parent = tungModel
@@ -796,25 +796,25 @@ pupilL.CanCollide = false pupilL.Anchored = true pupilL.Parent = tungModel
 local eyeR = eyeL:Clone() eyeR.Parent = tungModel
 local pupilR = pupilL:Clone() pupilR.Parent = tungModel
 
--- Legs
+-- Proportional Legs
 local legL = Instance.new("Part")
-legL.Size = Vector3.new(0.35, 1.8, 0.35)
+legL.Size = Vector3.new(0.3, 1.6, 0.3)
 legL.Color = woodColor
 legL.Material = Enum.Material.Wood
 legL.CanCollide = false legL.Anchored = true legL.Parent = tungModel
 
 local legR = legL:Clone() legR.Parent = tungModel
 
--- Bat Tool
+-- Wooden Bat
 local batPart = Instance.new("Part")
-batPart.Size = Vector3.new(0.3, 3.2, 0.3)
+batPart.Size = Vector3.new(0.25, 2.8, 0.25)
 batPart.Color = Color3.fromRGB(140, 80, 40)
 batPart.Material = Enum.Material.Wood
 batPart.CanCollide = false batPart.Anchored = true batPart.Parent = tungModel
 
 tungModel.Parent = FXContainer
 
--- Helper for transparency
+-- Transparency Manager
 local function SetCharTransparency(char, trans)
     for _, v in pairs(char:GetDescendants()) do
         if v:IsA("BasePart") or v:IsA("Decal") then
@@ -832,6 +832,7 @@ end
 -- ==========================================
 local auraAngle = 0
 local wingFlap = 0
+local walkCycle = 0
 
 local bodyVel = Instance.new("BodyVelocity") bodyVel.MaxForce = Vector3.new(0, 0, 0)
 local bodyGyro = Instance.new("BodyGyro") bodyGyro.MaxTorque = Vector3.new(0, 0, 0)
@@ -862,28 +863,34 @@ RunService.RenderStepped:Connect(function()
     else
         bodyVel.MaxForce = Vector3.new(0, 0, 0)
         bodyGyro.MaxTorque = Vector3.new(0, 0, 0)
-        if hum and not Config.Movement.Fly.Enabled and not Config.TungTung.Enabled then hum.PlatformStand = false end
+        if hum and not Config.Movement.Fly.Enabled then hum.PlatformStand = false end
     end
     
-    -- 2. Tung Tung Sahur Avatar & Animation Override
+    -- 2. Fully Playable Tung Tung Sahur Avatar
     if Config.TungTung.Enabled and hrp and char then
         SetCharTransparency(char, 1) -- Скрываем Roblox аватар
-        if hum then hum.PlatformStand = true end -- Отключаем анимацию ходьбы/прыжка
         
-        -- Позиционирование Tung Tung Sahur
+        local isWalking = (hum and hum.MoveDirection.Magnitude > 0)
+        if isWalking then
+            walkCycle = walkCycle + 0.2
+        else
+            walkCycle = 0
+        end
+        local legOffset = math.sin(walkCycle) * 0.4
+        
         local cf = hrp.CFrame
-        tungBody.CFrame = cf * CFrame.new(0, 0.4, 0) * CFrame.Angles(0, math.rad(90), 0)
-        tungHead.CFrame = cf * CFrame.new(0, 2.4, 0) * CFrame.Angles(0, math.rad(90), 0)
+        tungBody.CFrame = cf * CFrame.new(0, 0.2, 0) * CFrame.Angles(0, math.rad(90), 0)
+        tungHead.CFrame = cf * CFrame.new(0, 2.1, 0) * CFrame.Angles(0, math.rad(90), 0)
         
-        eyeL.CFrame = cf * CFrame.new(-0.35, 1.5, -0.6)
-        pupilL.CFrame = cf * CFrame.new(-0.35, 1.5, -0.65)
-        eyeR.CFrame = cf * CFrame.new(0.35, 1.5, -0.6)
-        pupilR.CFrame = cf * CFrame.new(0.35, 1.5, -0.65)
+        eyeL.CFrame = cf * CFrame.new(-0.3, 1.3, -0.55)
+        pupilL.CFrame = cf * CFrame.new(-0.3, 1.3, -0.6)
+        eyeR.CFrame = cf * CFrame.new(0.3, 1.3, -0.55)
+        pupilR.CFrame = cf * CFrame.new(0.3, 1.3, -0.6)
         
-        legL.CFrame = cf * CFrame.new(-0.4, -1.8, 0)
-        legR.CFrame = cf * CFrame.new(0.4, -1.8, 0)
+        legL.CFrame = cf * CFrame.new(-0.35, -1.6, legOffset)
+        legR.CFrame = cf * CFrame.new(0.35, -1.6, -legOffset)
         
-        batPart.CFrame = cf * CFrame.new(0.9, -0.6, -0.4) * CFrame.Angles(math.rad(25), 0, math.rad(-15))
+        batPart.CFrame = cf * CFrame.new(0.8, -0.5, -0.3) * CFrame.Angles(math.rad(25), 0, math.rad(-15))
     else
         if char then SetCharTransparency(char, 0) end
         tungBody.CFrame = CFrame.new(0, -999, 0)
