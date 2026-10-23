@@ -1,4 +1,4 @@
--- [[ quatrojoke Script | Ultimate MM2 Edition (Fly, Spin, Wings, Aura, Clean ESP) ]] --
+-- [[ quatrojoke Script | Fixed Movement & Enhanced Visual Effects ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -20,7 +20,7 @@ if Workspace:FindFirstChild("QuatroFXContainer") then
 end
 
 -- ==========================================
--- SCREEN GUI & CONTAINERS
+-- GUI & CONTAINERS
 -- ==========================================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "QuatrojokeUI"
@@ -30,20 +30,18 @@ ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 pcall(function() ScreenGui.Parent = CoreGui end)
 if not ScreenGui.Parent then ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui") end
 
--- Canvas for Tracers & Boxes
 local DrawingCanvas = Instance.new("Frame")
 DrawingCanvas.Name = "DrawingCanvas"
 DrawingCanvas.Size = UDim2.new(1, 0, 1, 0)
 DrawingCanvas.BackgroundTransparency = 1
 DrawingCanvas.Parent = ScreenGui
 
--- Folder for 3D Visual Effects (Aura, Wings)
 local FXContainer = Instance.new("Folder")
 FXContainer.Name = "QuatroFXContainer"
 FXContainer.Parent = Workspace
 
 -- ==========================================
--- MAIN GUI FRAME
+-- MAIN FRAME
 -- ==========================================
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
@@ -104,7 +102,7 @@ CloseBtn.MouseButton1Click:Connect(function()
     ScreenGui:Destroy() 
 end)
 
--- Dragging Logic
+-- Dragging
 local dragging, dragStart, startPos
 TopBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -123,7 +121,7 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Sidebar (Left Tabs)
+-- Sidebar
 local SideBar = Instance.new("Frame")
 SideBar.Size = UDim2.new(0, 150, 1, -40)
 SideBar.Position = UDim2.new(0, 0, 0, 40)
@@ -142,7 +140,7 @@ SidePadding.PaddingLeft = UDim.new(0, 8)
 SidePadding.PaddingRight = UDim.new(0, 8)
 SidePadding.Parent = SideBar
 
--- Content Area (Right)
+-- Content Area
 local ContentArea = Instance.new("Frame")
 ContentArea.Size = UDim2.new(1, -150, 1, -40)
 ContentArea.Position = UDim2.new(0, 150, 0, 40)
@@ -150,7 +148,7 @@ ContentArea.BackgroundTransparency = 1
 ContentArea.Parent = MainFrame
 
 -- ==========================================
--- INTRO FRAME (Centered 580x440)
+-- INTRO FRAME
 -- ==========================================
 local IntroFrame = Instance.new("Frame")
 IntroFrame.Name = "IntroFrame"
@@ -226,7 +224,7 @@ StatusLabel.Parent = IntroFrame
 
 math.randomseed(os.time())
 local loadTime = math.random(4, 14)
-local statuses = {"Загрузка модулей...", "Настройка вкладок...", "Создание крыльев...", "Оптимизация...", "Запуск quatrojoke..."}
+local statuses = {"Загрузка анимированных крыльев...", "Настройка Fly & Spin...", "Улучшение Ауры...", "Оптимизация...", "Запуск quatrojoke..."}
 
 task.spawn(function()
     local elapsed = 0
@@ -300,7 +298,7 @@ local function ShowGunAlert()
 end
 
 -- ==========================================
--- FULL CONFIG DATA
+-- CONFIG DATA
 -- ==========================================
 local Config = {
     Outlines = {
@@ -319,8 +317,8 @@ local Config = {
         Sheriff  = { Enabled = false, Color = Color3.fromRGB(0, 140, 255), Transparency = 1 },
         Murder   = { Enabled = false, Color = Color3.fromRGB(255, 30, 60), Transparency = 1 }
     },
-    Aura = { Enabled = false, Color = Color3.fromRGB(255, 30, 60), Transparency = 0.8, Neon = true },
-    Angel = { Enabled = false, Color = Color3.fromRGB(0, 200, 255), Transparency = 0.5, Neon = true },
+    Aura = { Enabled = false, Color = Color3.fromRGB(255, 30, 60), Transparency = 0.8 },
+    Angel = { Enabled = false, Color = Color3.fromRGB(0, 200, 255), Transparency = 0.5 },
     Movement = {
         Fly = { Enabled = false, Speed = 50, BatmanAnim = false },
         Spin = { Enabled = false, Speed = 20 },
@@ -329,7 +327,7 @@ local Config = {
 }
 
 -- ==========================================
--- TAB SYSTEM CREATION
+-- TABS & UI BUILDER
 -- ==========================================
 local Tabs = {}
 local CurrentTab = nil
@@ -363,7 +361,7 @@ local function CreateTab(name)
     layout.Parent = container
     
     layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        container.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 15)
+        container.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 20)
     end)
     
     btn.MouseButton1Click:Connect(function()
@@ -400,8 +398,13 @@ local PaletteColors = {
     Color3.fromRGB(255, 255, 255)
 }
 
--- UI Section Builder Helper
 local function CreateSection(parentTab, cfgRef, titleText, options)
+    options = options or {}
+    local hasColor = options.Color ~= false
+    local hasTrans = options.Transparency ~= false
+    local customSub = options.CustomSub
+    local expandedHeight = options.ExpandedHeight or 170
+
     local sectionFrame = Instance.new("Frame")
     sectionFrame.Size = UDim2.new(1, -8, 0, 38)
     sectionFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
@@ -465,15 +468,10 @@ local function CreateSection(parentTab, cfgRef, titleText, options)
     expandBtn.Parent = topToggle
     
     local subPanel = Instance.new("Frame")
-    subPanel.Size = UDim2.new(1, -20, 0, 150)
+    subPanel.Size = UDim2.new(1, -20, 0, expandedHeight - 40)
     subPanel.Position = UDim2.new(0, 10, 0, 42)
     subPanel.BackgroundTransparency = 1
     subPanel.Parent = sectionFrame
-    
-    options = options or {}
-    local hasColor = options.Color ~= false
-    local hasTrans = options.Transparency ~= false
-    local customSub = options.CustomSub
     
     local yOffset = 0
     
@@ -594,7 +592,7 @@ local function CreateSection(parentTab, cfgRef, titleText, options)
         expanded = not expanded
         expandBtn.Text = expanded and "▲" or "▼"
         secStroke.Color = expanded and Color3.fromRGB(255, 30, 60) or Color3.fromRGB(45, 45, 55)
-        TweenService:Create(sectionFrame, TweenInfo.new(0.25), {Size = UDim2.new(1, -8, 0, expanded and 185 or 38)}):Play()
+        TweenService:Create(sectionFrame, TweenInfo.new(0.25), {Size = UDim2.new(1, -8, 0, expanded and expandedHeight or 38)}):Play()
     end)
 end
 
@@ -615,6 +613,7 @@ CreateSection(TabVisuals, Config.Outlines.Innocent, "Outline Innocent")
 CreateSection(TabVisuals, Config.Outlines.Sheriff, "ESP Sheriff")
 CreateSection(TabVisuals, Config.Outlines.Murder, "ESP Murder")
 CreateSection(TabVisuals, Config.Outlines.Gun, "ESP Gun", {
+    ExpandedHeight = 190,
     CustomSub = function(panel, y)
         local alertLbl = Instance.new("TextLabel")
         alertLbl.Size = UDim2.new(0.7, 0, 0, 22)
@@ -634,19 +633,9 @@ CreateSection(TabVisuals, Config.Outlines.Gun, "ESP Gun", {
         alertBtn.Text = ""
         alertBtn.Parent = panel
         
-        local aCorner = Instance.new("UICorner")
-        aCorner.CornerRadius = UDim.new(1, 0)
-        aCorner.Parent = alertBtn
-        
-        local aDot = Instance.new("Frame")
-        aDot.Size = UDim2.new(0, 12, 0, 12)
-        aDot.Position = UDim2.new(0, 3, 0.5, -6)
-        aDot.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
-        aDot.Parent = alertBtn
-        
-        local adCorner = Instance.new("UICorner")
-        adCorner.CornerRadius = UDim.new(1, 0)
-        adCorner.Parent = aDot
+        local aCorner = Instance.new("UICorner") aCorner.CornerRadius = UDim.new(1, 0) aCorner.Parent = alertBtn
+        local aDot = Instance.new("Frame") aDot.Size = UDim2.new(0, 12, 0, 12) aDot.Position = UDim2.new(0, 3, 0.5, -6) aDot.BackgroundColor3 = Color3.fromRGB(150, 150, 150) aDot.Parent = alertBtn
+        local adCorner = Instance.new("UICorner") adCorner.CornerRadius = UDim.new(1, 0) adCorner.Parent = aDot
         
         alertBtn.MouseButton1Click:Connect(function()
             Config.Outlines.Gun.AlertEnabled = not Config.Outlines.Gun.AlertEnabled
@@ -679,10 +668,50 @@ CreateHeader(TabMove, "MOVEMENT MODES")
 CreateSection(TabMove, Config.Movement.Fly, "Fly (Полет)", {
     Color = false,
     Transparency = false,
+    ExpandedHeight = 120,
     CustomSub = function(panel, y)
+        local speedLbl = Instance.new("TextLabel")
+        speedLbl.Size = UDim2.new(1, 0, 0, 20)
+        speedLbl.Position = UDim2.new(0, 0, 0, y)
+        speedLbl.BackgroundTransparency = 1
+        speedLbl.Text = "Fly Speed: " .. Config.Movement.Fly.Speed
+        speedLbl.Font = Enum.Font.Gotham
+        speedLbl.TextSize = 12
+        speedLbl.TextColor3 = Color3.fromRGB(170, 170, 170)
+        speedLbl.TextXAlignment = Enum.TextXAlignment.Left
+        speedLbl.Parent = panel
+        
+        local sliderBg = Instance.new("Frame")
+        sliderBg.Size = UDim2.new(1, 0, 0, 8)
+        sliderBg.Position = UDim2.new(0, 0, 0, y + 22)
+        sliderBg.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+        sliderBg.Parent = panel
+        
+        local sFill = Instance.new("Frame")
+        sFill.Size = UDim2.new(Config.Movement.Fly.Speed / 150, 0, 1, 0)
+        sFill.BackgroundColor3 = Color3.fromRGB(255, 30, 60)
+        sFill.Parent = sliderBg
+        
+        local sliding = false
+        sliderBg.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then sliding = true end
+        end)
+        UserInputService.InputChanged:Connect(function(input)
+            if sliding and input.UserInputType == Enum.UserInputType.MouseMovement then
+                local pos = math.clamp((input.Position.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0.05, 1)
+                sFill.Size = UDim2.new(pos, 0, 1, 0)
+                local val = math.floor(pos * 150)
+                speedLbl.Text = "Fly Speed: " .. val
+                Config.Movement.Fly.Speed = val
+            end
+        end)
+        UserInputService.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then sliding = false end
+        end)
+        
         local animLbl = Instance.new("TextLabel")
         animLbl.Size = UDim2.new(0.7, 0, 0, 22)
-        animLbl.Position = UDim2.new(0, 0, 0, y)
+        animLbl.Position = UDim2.new(0, 0, 0, y + 36)
         animLbl.BackgroundTransparency = 1
         animLbl.Text = "Batman Fly Animation"
         animLbl.Font = Enum.Font.GothamMedium
@@ -693,7 +722,7 @@ CreateSection(TabMove, Config.Movement.Fly, "Fly (Полет)", {
         
         local animBtn = Instance.new("TextButton")
         animBtn.Size = UDim2.new(0, 36, 0, 18)
-        animBtn.Position = UDim2.new(1, -36, 0, y + 2)
+        animBtn.Position = UDim2.new(1, -36, 0, y + 38)
         animBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
         animBtn.Text = ""
         animBtn.Parent = panel
@@ -711,11 +740,56 @@ CreateSection(TabMove, Config.Movement.Fly, "Fly (Полет)", {
     end
 })
 
-CreateSection(TabMove, Config.Movement.Spin, "Spin (Вращение)", {Color = false, Transparency = false})
-CreateSection(TabMove, Config.Movement.Noclip, "Noclip (Сквозь стены)", {Color = false, Transparency = false})
+CreateSection(TabMove, Config.Movement.Spin, "Spin (Вращение)", {
+    Color = false,
+    Transparency = false,
+    ExpandedHeight = 90,
+    CustomSub = function(panel, y)
+        local spinLbl = Instance.new("TextLabel")
+        spinLbl.Size = UDim2.new(1, 0, 0, 20)
+        spinLbl.Position = UDim2.new(0, 0, 0, y)
+        spinLbl.BackgroundTransparency = 1
+        spinLbl.Text = "Spin Speed: " .. Config.Movement.Spin.Speed
+        spinLbl.Font = Enum.Font.Gotham
+        spinLbl.TextSize = 12
+        spinLbl.TextColor3 = Color3.fromRGB(170, 170, 170)
+        spinLbl.TextXAlignment = Enum.TextXAlignment.Left
+        spinLbl.Parent = panel
+        
+        local sliderBg = Instance.new("Frame")
+        sliderBg.Size = UDim2.new(1, 0, 0, 8)
+        sliderBg.Position = UDim2.new(0, 0, 0, y + 22)
+        sliderBg.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+        sliderBg.Parent = panel
+        
+        local sFill = Instance.new("Frame")
+        sFill.Size = UDim2.new(Config.Movement.Spin.Speed / 100, 0, 1, 0)
+        sFill.BackgroundColor3 = Color3.fromRGB(255, 30, 60)
+        sFill.Parent = sliderBg
+        
+        local sliding = false
+        sliderBg.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then sliding = true end
+        end)
+        UserInputService.InputChanged:Connect(function(input)
+            if sliding and input.UserInputType == Enum.UserInputType.MouseMovement then
+                local pos = math.clamp((input.Position.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0.05, 1)
+                sFill.Size = UDim2.new(pos, 0, 1, 0)
+                local val = math.floor(pos * 100)
+                spinLbl.Text = "Spin Speed: " .. val
+                Config.Movement.Spin.Speed = val
+            end
+        end)
+        UserInputService.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then sliding = false end
+        end)
+    end
+})
+
+CreateSection(TabMove, Config.Movement.Noclip, "Noclip (Сквозь стены)", {Color = false, Transparency = false, ExpandedHeight = 40})
 
 -- ==========================================
--- LOGIC & OPTIMIZED RENDER LOOPS
+-- REALISTIC WINGS & SPIRAL AURA CREATION
 -- ==========================================
 local function GetPlayerRole(plr)
     if not plr or not plr.Character then return "Innocent" end
@@ -735,11 +809,11 @@ local function GetDroppedGun()
     return nil
 end
 
--- Create 6 Floating Aura Bars
+-- Create 6 Spiral Aura Particles
 local auraBars = {}
 for i = 1, 6 do
     local bar = Instance.new("Part")
-    bar.Size = Vector3.new(0.3, 2.2, 0.3)
+    bar.Size = Vector3.new(0.2, 1.8, 0.2)
     bar.CanCollide = false
     bar.Anchored = true
     bar.Material = Enum.Material.Neon
@@ -748,37 +822,81 @@ for i = 1, 6 do
     table.insert(auraBars, bar)
 end
 
--- Create 3D Angel Wings Parts
-local wingParts = {}
-for i = 1, 10 do
-    local p = Instance.new("Part")
-    p.Size = Vector3.new(0.4, 1.8, 0.3)
-    p.CanCollide = false
-    p.Anchored = true
-    p.Material = Enum.Material.Neon
-    p.Transparency = 1
-    p.Parent = FXContainer
-    table.insert(wingParts, p)
+-- Create Realistic Layered Wings (18 Feathers)
+local wingFeathers = {}
+for side = -1, 1, 2 do
+    for layer = 1, 3 do
+        for i = 1, 3 do
+            local f = Instance.new("Part")
+            f.Size = Vector3.new(0.15, 1.2 + (i * 0.4), 0.1)
+            f.CanCollide = false
+            f.Anchored = true
+            f.Material = Enum.Material.Neon
+            f.Transparency = 1
+            f.Parent = FXContainer
+            table.insert(wingFeathers, {Part = f, Side = side, Layer = layer, Index = i})
+        end
+    end
 end
 
+-- ==========================================
+-- FLY & RENDER ENGINE
+-- ==========================================
 local auraAngle = 0
+local wingFlap = 0
 
--- RenderStepped / Movement / Effects Loop
-RunService.RenderStepped:Connect(function(dt)
+-- Fly Velocity setup
+local bodyVel = Instance.new("BodyVelocity")
+bodyVel.MaxForce = Vector3.new(0, 0, 0)
+
+local bodyGyro = Instance.new("BodyGyro")
+bodyGyro.MaxTorque = Vector3.new(0, 0, 0)
+
+RunService.RenderStepped:Connect(function()
     local char = LocalPlayer.Character
     local hrp = char and char:FindFirstChild("HumanoidRootPart")
     local hum = char and char:FindFirstChild("Humanoid")
     
-    -- 1. Aura Animation
+    -- 1. Fly Logic Implementation
+    if Config.Movement.Fly.Enabled and hrp and hum then
+        bodyVel.Parent = hrp
+        bodyGyro.Parent = hrp
+        bodyVel.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+        bodyGyro.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
+        
+        local moveDir = Vector3.new()
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDir = moveDir + Camera.CFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDir = moveDir - Camera.CFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - Camera.CFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + Camera.CFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDir = moveDir + Vector3.new(0, 1, 0) end
+        if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then moveDir = moveDir - Vector3.new(0, 1, 0) end
+        
+        bodyVel.Velocity = moveDir * Config.Movement.Fly.Speed
+        bodyGyro.CFrame = Camera.CFrame
+        
+        if Config.Movement.Fly.BatmanAnim then
+            hum.PlatformStand = true
+        else
+            hum.PlatformStand = false
+        end
+    else
+        bodyVel.MaxForce = Vector3.new(0, 0, 0)
+        bodyGyro.MaxTorque = Vector3.new(0, 0, 0)
+        if hum then hum.PlatformStand = false end
+    end
+    
+    -- 2. Enhanced Spiral Aura
     local cfgA = Config.Aura
     if cfgA.Enabled and hrp then
-        auraAngle = auraAngle + 0.04
+        auraAngle = auraAngle + 0.05
         for i, bar in ipairs(auraBars) do
-            local offsetAngle = auraAngle + (i * (math.pi / 3))
-            local x = math.cos(offsetAngle) * 3.5
-            local z = math.sin(offsetAngle) * 3.5
-            local y = math.sin(offsetAngle * 2) * 1.2
-            bar.CFrame = CFrame.new(hrp.Position + Vector3.new(x, y, z)) * CFrame.Angles(offsetAngle, offsetAngle * 0.5, 0)
+            local offset = auraAngle + (i * (math.pi / 3))
+            local radius = 3.2
+            local x = math.cos(offset) * radius
+            local z = math.sin(offset) * radius
+            local y = math.sin(auraAngle * 2 + i) * 1.5
+            bar.CFrame = CFrame.new(hrp.Position + Vector3.new(x, y, z)) * CFrame.Angles(offset, offset * 0.5, 0)
             bar.Color = cfgA.Color
             bar.Transparency = 1 - cfgA.Transparency
         end
@@ -786,34 +904,46 @@ RunService.RenderStepped:Connect(function(dt)
         for _, bar in ipairs(auraBars) do bar.Transparency = 1 end
     end
     
-    -- 2. Angel Wings Animation
+    -- 3. Realistic Animated Wings
     local cfgW = Config.Angel
     if cfgW.Enabled and hrp then
-        for i, p in ipairs(wingParts) do
-            local side = i <= 5 and -1 or 1
-            local idx = (i - 1) % 5 + 1
-            local wingPos = hrp.CFrame * CFrame.new(side * (1 + idx * 0.5), 0.5 + (idx * 0.3), 1) * CFrame.Angles(0, 0, side * math.rad(15 * idx))
-            p.CFrame = wingPos
+        wingFlap = wingFlap + 0.06
+        local flapAngle = math.sin(wingFlap) * 0.25
+        
+        for _, featherData in ipairs(wingFeathers) do
+            local p = featherData.Part
+            local side = featherData.Side
+            local layer = featherData.Layer
+            local idx = featherData.Index
+            
+            local xOffset = side * (0.8 + (idx * 0.45) + (layer * 0.1))
+            local yOffset = 0.8 + (idx * 0.2) - (layer * 0.3)
+            local zOffset = 0.8 + (layer * 0.15)
+            
+            local localCFrame = CFrame.new(xOffset, yOffset, zOffset) 
+                              * CFrame.Angles(0, side * (math.rad(25 + idx * 10) + flapAngle), side * math.rad(-20 - idx * 5))
+            
+            p.CFrame = hrp.CFrame * localCFrame
             p.Color = cfgW.Color
             p.Transparency = 1 - cfgW.Transparency
         end
     else
-        for _, p in ipairs(wingParts) do p.Transparency = 1 end
+        for _, featherData in ipairs(wingFeathers) do featherData.Part.Transparency = 1 end
     end
     
-    -- 3. Spin Logic
+    -- 4. Spin Logic
     if Config.Movement.Spin.Enabled and hrp then
         hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(Config.Movement.Spin.Speed), 0)
     end
     
-    -- 4. Noclip Logic
+    -- 5. Noclip
     if Config.Movement.Noclip.Enabled and char then
         for _, v in pairs(char:GetDescendants()) do
             if v:IsA("BasePart") then v.CanCollide = false end
         end
     end
     
-    -- 5. Clean Tracers & Boxes Rendering
+    -- 6. Clean Canvas ESP (Tracers & Boxes)
     DrawingCanvas:ClearAllChildren()
     for _, plr in pairs(Players:GetPlayers()) do
         if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
@@ -823,7 +953,6 @@ RunService.RenderStepped:Connect(function(dt)
             local pos, onScreen = Camera:WorldToViewportPoint(p_hrp.Position)
             
             if onScreen then
-                -- Tracers (Clean Lines)
                 local cfgT = Config.Tracers[role]
                 if cfgT and cfgT.Enabled and cfgT.Transparency > 0 then
                     local line = Instance.new("Frame")
@@ -841,7 +970,6 @@ RunService.RenderStepped:Connect(function(dt)
                     line.Parent = DrawingCanvas
                 end
                 
-                -- Clean Boxes (Lines instead of solid blocks)
                 local cfgB = Config.Boxes[role]
                 if cfgB and cfgB.Enabled and cfgB.Transparency > 0 then
                     local headPos = Camera:WorldToViewportPoint(p_head.Position + Vector3.new(0, 0.8, 0))
@@ -872,7 +1000,6 @@ task.spawn(function()
     while task.wait(0.1) do
         if not ScreenGui.Parent then break end
         
-        -- Player Outlines
         for _, plr in pairs(Players:GetPlayers()) do
             if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
                 local role = GetPlayerRole(plr)
@@ -894,7 +1021,6 @@ task.spawn(function()
             end
         end
         
-        -- Gun Outlines & Alert
         local droppedGun = GetDroppedGun()
         if droppedGun then
             if not gunWasOnMap then
@@ -922,7 +1048,7 @@ task.spawn(function()
     end
 end)
 
--- Minimize Keybind (LeftControl)
+-- Keybind Minimize (LeftControl)
 local minimized = false
 UserInputService.InputBegan:Connect(function(input, gpe)
     if not gpe and input.KeyCode == Enum.KeyCode.LeftControl then
