@@ -1,4 +1,4 @@
--- [[ quatrojoke Script | Fixed Animated Aura + Full Visuals ]] --
+-- [[ quatrojoke Script | FIXED & FULLY WORKING EDITION ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -12,6 +12,10 @@ local Camera = workspace.CurrentCamera
 -- Защита от повторного запуска
 if CoreGui:FindFirstChild("QuatrojokeUI") then
     CoreGui:FindFirstChild("QuatrojokeUI"):Destroy()
+end
+
+if workspace:FindFirstChild("QuatroAuraContainer") then
+    workspace:FindFirstChild("QuatroAuraContainer"):Destroy()
 end
 
 -- ==========================================
@@ -221,7 +225,7 @@ StatusLabel.Parent = IntroFrame
 
 math.randomseed(os.time())
 local loadTime = math.random(4, 14)
-local statuses = {"Исправление Aura...", "Загрузка 3D-анимаций...", "Настройка неона...", "Оптимизация...", "Запуск quatrojoke..."}
+local statuses = {"Исправление ошибок...", "Загрузка Visuals...", "Настройка неона...", "Оптимизация...", "Запуск quatrojoke..."}
 
 task.spawn(function()
     local elapsed = 0
@@ -679,12 +683,12 @@ local function GetDroppedGun()
     return nil
 end
 
--- Create 6 Floating Aura Bars (No Collision / No Physics Bug)
+-- Create 6 Floating Aura Bars
 local auraBars = {}
 for i = 1, 6 do
     local bar = Instance.new("Part")
     bar.Name = "AuraBar_" .. i
-    bar.Size = Vector3.new(0.3, 2.2, 0.3) -- Средний размер
+    bar.Size = Vector3.new(0.3, 2.2, 0.3)
     bar.CanCollide = false
     bar.CanQuery = false
     bar.CanTouch = false
@@ -697,22 +701,21 @@ end
 
 local auraAngle = 0
 
--- RenderStepped Loop for Smooth Aura Animation (X and Y Axis Movement)
+-- RenderStepped Loop for Smooth Visuals
 RunService.RenderStepped:Connect(function()
     -- 1. Animated Aura
     local cfgA = Config.Aura
     if cfgA.Enabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
         local hrp = LocalPlayer.Character.HumanoidRootPart
-        auraAngle = auraAngle + 0.04 -- Скорость вращения
+        auraAngle = auraAngle + 0.04
         
         for i, bar in ipairs(auraBars) do
             local offsetAngle = auraAngle + (i * (math.pi / 3))
             local radius = 3.5
             
-            -- Движение по осям X, Y и Z
             local x = math.cos(offsetAngle) * radius
             local z = math.sin(offsetAngle) * radius
-            local y = math.sin(offsetAngle * 2) * 1.2 -- Плавный подъём и спуск по оси Y
+            local y = math.sin(offsetAngle * 2) * 1.2
             
             bar.CFrame = CFrame.new(hrp.Position + Vector3.new(x, y, z)) * CFrame.Angles(offsetAngle, offsetAngle * 0.5, 0)
             bar.Color = cfgA.Color
@@ -829,7 +832,7 @@ task.spawn(function()
                 hlG.OutlineColor = cfgG.Color
                 hlG.OutlineTransparency = 1 - cfgG.Transparency
             else
-                if hlG me then hlG:Destroy() end
+                if hlG then hlG:Destroy() end
             end
         else
             gunWasOnMap = false
