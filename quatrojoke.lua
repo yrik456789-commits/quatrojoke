@@ -1,4 +1,4 @@
--- [[ quatrojoke Script | Tung Tung Sahur Playable Model Update ]] --
+-- [[ quatrojoke Script | Playable Solid Tung Tung Sahur Fix ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -185,7 +185,7 @@ StatusLabel.Parent = IntroFrame
 
 math.randomseed(os.time())
 local loadTime = math.random(4, 14)
-local statuses = {"Калибровка роста Tung Tung Sahur...", "Настройка движений...", "Подключение механики...", "Запуск quatrojoke..."}
+local statuses = {"Создание цельной модели Tung Tung...", "Удаление оригинального тела...", "Настройка контроллера...", "Запуск quatrojoke..."}
 
 task.spawn(function()
     local elapsed = 0
@@ -690,7 +690,7 @@ CreateSection(TabMove, Config.Movement.Spin, "Spin (Вращение)", {
 CreateSection(TabMove, Config.Movement.Noclip, "Noclip (Сквозь стены)", {Color = false, Transparency = false, ExpandedHeight = 40})
 
 -- ==========================================
--- PLAYABLE TUNG TUNG SAHUR ARCHITECTURE
+-- PLAYABLE SOLID TUNG TUNG SAHUR ARCHITECTURE
 -- ==========================================
 local function GetPlayerRole(plr)
     if not plr or not plr.Character then return "Innocent" end
@@ -751,15 +751,15 @@ for side = -1, 1, 2 do
     end
 end
 
--- Create Proportional Tung Tung Sahur Model
+-- Create Solid Tung Tung Model
 local tungModel = Instance.new("Model")
-tungModel.Name = "TungTungSahurModel"
+tungModel.Name = "SolidTungTungModel"
 
 local woodColor = Color3.fromRGB(180, 115, 60)
 
--- Main Pillar Body
+-- Main Trunk Body (Solid Block without holes)
 local tungBody = Instance.new("Part")
-tungBody.Size = Vector3.new(1.4, 3.8, 1.1)
+tungBody.Size = Vector3.new(1.5, 3.8, 1.5)
 tungBody.Color = woodColor
 tungBody.Material = Enum.Material.Wood
 tungBody.CanCollide = false
@@ -768,19 +768,22 @@ tungBody.Parent = tungModel
 
 local bodyMesh = Instance.new("SpecialMesh")
 bodyMesh.MeshType = Enum.MeshType.Cylinder
-bodyMesh.Scale = Vector3.new(1, 1, 1)
 bodyMesh.Parent = tungBody
 
--- Head Cap
+-- Solid Rounded Head
 local tungHead = Instance.new("Part")
-tungHead.Size = Vector3.new(1.4, 0.5, 1.1)
-tungHead.Color = Color3.fromRGB(150, 90, 45)
+tungHead.Size = Vector3.new(1.5, 0.6, 1.5)
+tungHead.Color = Color3.fromRGB(140, 85, 40)
 tungHead.Material = Enum.Material.Wood
 tungHead.CanCollide = false
 tungHead.Anchored = true
 tungHead.Parent = tungModel
 
--- Eyes
+local headMesh = Instance.new("SpecialMesh")
+headMesh.MeshType = Enum.MeshType.Sphere
+headMesh.Parent = tungHead
+
+-- Eyes & Face
 local eyeL = Instance.new("Part")
 eyeL.Size = Vector3.new(0.35, 0.35, 0.1)
 eyeL.Color = Color3.fromRGB(255, 255, 255)
@@ -796,33 +799,49 @@ pupilL.CanCollide = false pupilL.Anchored = true pupilL.Parent = tungModel
 local eyeR = eyeL:Clone() eyeR.Parent = tungModel
 local pupilR = pupilL:Clone() pupilR.Parent = tungModel
 
--- Proportional Legs
+-- Legs
 local legL = Instance.new("Part")
-legL.Size = Vector3.new(0.3, 1.6, 0.3)
+legL.Size = Vector3.new(0.32, 1.6, 0.32)
 legL.Color = woodColor
 legL.Material = Enum.Material.Wood
 legL.CanCollide = false legL.Anchored = true legL.Parent = tungModel
 
 local legR = legL:Clone() legR.Parent = tungModel
 
--- Wooden Bat
+-- Bat
 local batPart = Instance.new("Part")
-batPart.Size = Vector3.new(0.25, 2.8, 0.25)
-batPart.Color = Color3.fromRGB(140, 80, 40)
+batPart.Size = Vector3.new(0.28, 2.8, 0.28)
+batPart.Color = Color3.fromRGB(130, 75, 35)
 batPart.Material = Enum.Material.Wood
 batPart.CanCollide = false batPart.Anchored = true batPart.Parent = tungModel
 
 tungModel.Parent = FXContainer
 
--- Transparency Manager
-local function SetCharTransparency(char, trans)
+-- Hide entire player avatar cleanly
+local function HidePlayerAvatar(char)
     for _, v in pairs(char:GetDescendants()) do
-        if v:IsA("BasePart") or v:IsA("Decal") then
+        if v:IsA("BasePart") then
             if v.Name ~= "HumanoidRootPart" then
-                v.Transparency = trans
+                v.Transparency = 1
             end
+        elseif v:IsA("Decal") or v:IsA("Texture") then
+            v.Transparency = 1
         elseif v:IsA("Accessory") and v:FindFirstChild("Handle") then
-            v.Handle.Transparency = trans
+            v.Handle.Transparency = 1
+        end
+    end
+end
+
+local function RestorePlayerAvatar(char)
+    for _, v in pairs(char:GetDescendants()) do
+        if v:IsA("BasePart") then
+            if v.Name ~= "HumanoidRootPart" then
+                v.Transparency = 0
+            end
+        elseif v:IsA("Decal") or v:IsA("Texture") then
+            v.Transparency = 0
+        elseif v:IsA("Accessory") and v:FindFirstChild("Handle") then
+            v.Handle.Transparency = 0
         end
     end
 end
@@ -866,33 +885,29 @@ RunService.RenderStepped:Connect(function()
         if hum and not Config.Movement.Fly.Enabled then hum.PlatformStand = false end
     end
     
-    -- 2. Fully Playable Tung Tung Sahur Avatar
+    -- 2. Complete Avatar Replacement (Tung Tung Sahur Controller)
     if Config.TungTung.Enabled and hrp and char then
-        SetCharTransparency(char, 1) -- Скрываем Roblox аватар
+        HidePlayerAvatar(char) -- Полное исчезновение твоего скина
         
         local isWalking = (hum and hum.MoveDirection.Magnitude > 0)
-        if isWalking then
-            walkCycle = walkCycle + 0.2
-        else
-            walkCycle = 0
-        end
-        local legOffset = math.sin(walkCycle) * 0.4
+        if isWalking then walkCycle = walkCycle + 0.22 else walkCycle = 0 end
+        local legOffset = math.sin(walkCycle) * 0.45
         
         local cf = hrp.CFrame
         tungBody.CFrame = cf * CFrame.new(0, 0.2, 0) * CFrame.Angles(0, math.rad(90), 0)
         tungHead.CFrame = cf * CFrame.new(0, 2.1, 0) * CFrame.Angles(0, math.rad(90), 0)
         
-        eyeL.CFrame = cf * CFrame.new(-0.3, 1.3, -0.55)
-        pupilL.CFrame = cf * CFrame.new(-0.3, 1.3, -0.6)
-        eyeR.CFrame = cf * CFrame.new(0.3, 1.3, -0.55)
-        pupilR.CFrame = cf * CFrame.new(0.3, 1.3, -0.6)
+        eyeL.CFrame = cf * CFrame.new(-0.32, 1.35, -0.6)
+        pupilL.CFrame = cf * CFrame.new(-0.32, 1.35, -0.65)
+        eyeR.CFrame = cf * CFrame.new(0.32, 1.35, -0.6)
+        pupilR.CFrame = cf * CFrame.new(0.32, 1.35, -0.65)
         
         legL.CFrame = cf * CFrame.new(-0.35, -1.6, legOffset)
         legR.CFrame = cf * CFrame.new(0.35, -1.6, -legOffset)
         
-        batPart.CFrame = cf * CFrame.new(0.8, -0.5, -0.3) * CFrame.Angles(math.rad(25), 0, math.rad(-15))
+        batPart.CFrame = cf * CFrame.new(0.85, -0.4, -0.3) * CFrame.Angles(math.rad(25), 0, math.rad(-15))
     else
-        if char then SetCharTransparency(char, 0) end
+        if char then RestorePlayerAvatar(char) end
         tungBody.CFrame = CFrame.new(0, -999, 0)
         tungHead.CFrame = CFrame.new(0, -999, 0)
         eyeL.CFrame = CFrame.new(0, -999, 0)
