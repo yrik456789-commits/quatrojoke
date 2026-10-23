@@ -1,4 +1,4 @@
--- [[ quatrojoke Script | Optimized FPS Edition + Centered Intro + Gun ESP ]] --
+-- [[ quatrojoke Script | Visuals Deluxe Edition (Tracers, Boxes, Aura) ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -7,6 +7,7 @@ local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
 
 local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
 
 -- Защита от повторного запуска
 if CoreGui:FindFirstChild("QuatrojokeUI") then
@@ -14,7 +15,7 @@ if CoreGui:FindFirstChild("QuatrojokeUI") then
 end
 
 -- ==========================================
--- SCREEN GUI
+-- SCREEN GUI & CONTAINERS
 -- ==========================================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "QuatrojokeUI"
@@ -23,6 +24,13 @@ ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 pcall(function() ScreenGui.Parent = CoreGui end)
 if not ScreenGui.Parent then ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui") end
+
+-- Canvas for Tracers & Boxes
+local DrawingCanvas = Instance.new("Frame")
+DrawingCanvas.Name = "DrawingCanvas"
+DrawingCanvas.Size = UDim2.new(1, 0, 1, 0)
+DrawingCanvas.BackgroundTransparency = 1
+DrawingCanvas.Parent = ScreenGui
 
 -- ==========================================
 -- MAIN GUI FRAME
@@ -83,7 +91,7 @@ CloseCorner.Parent = CloseBtn
 
 CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
 
--- Dragging Logic
+-- Dragging
 local dragging, dragStart, startPos
 TopBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -129,7 +137,7 @@ ContentArea.BackgroundTransparency = 1
 ContentArea.Parent = MainFrame
 
 -- ==========================================
--- INTRO FRAME (GUI Size: 560x420 Centered)
+-- INTRO FRAME
 -- ==========================================
 local IntroFrame = Instance.new("Frame")
 IntroFrame.Name = "IntroFrame"
@@ -205,7 +213,7 @@ StatusLabel.Parent = IntroFrame
 
 math.randomseed(os.time())
 local loadTime = math.random(4, 14)
-local statuses = {"Оптимизация FPS...", "Настройка вкладок...", "Загрузка красного неона...", "Проверка Gun ESP...", "Запуск quatrojoke..."}
+local statuses = {"Загрузка Visuals...", "Настройка Tracers & Boxes...", "Подготовка эффекта Aura...", "Оптимизация кадров...", "Запуск quatrojoke..."}
 
 task.spawn(function()
     local elapsed = 0
@@ -279,13 +287,26 @@ local function ShowGunAlert()
 end
 
 -- ==========================================
--- ESP CONFIG DATA
+-- FULL CONFIG DATA
 -- ==========================================
-local ESP_Settings = {
-    Innocent = { Enabled = false, Color = Color3.fromRGB(0, 255, 120), Transparency = 1 },
-    Sheriff  = { Enabled = false, Color = Color3.fromRGB(0, 140, 255), Transparency = 1 },
-    Murder   = { Enabled = false, Color = Color3.fromRGB(255, 30, 60), Transparency = 1 },
-    Gun      = { Enabled = false, Color = Color3.fromRGB(255, 200, 0), Transparency = 1, AlertEnabled = false }
+local Config = {
+    Outlines = {
+        Innocent = { Enabled = false, Color = Color3.fromRGB(0, 255, 120), Transparency = 1 },
+        Sheriff  = { Enabled = false, Color = Color3.fromRGB(0, 140, 255), Transparency = 1 },
+        Murder   = { Enabled = false, Color = Color3.fromRGB(255, 30, 60), Transparency = 1 },
+        Gun      = { Enabled = false, Color = Color3.fromRGB(255, 200, 0), Transparency = 1, AlertEnabled = false }
+    },
+    Tracers = {
+        Innocent = { Enabled = false, Color = Color3.fromRGB(0, 255, 120), Transparency = 1 },
+        Sheriff  = { Enabled = false, Color = Color3.fromRGB(0, 140, 255), Transparency = 1 },
+        Murder   = { Enabled = false, Color = Color3.fromRGB(255, 30, 60), Transparency = 1 }
+    },
+    Boxes = {
+        Innocent = { Enabled = false, Color = Color3.fromRGB(0, 255, 120), Transparency = 1 },
+        Sheriff  = { Enabled = false, Color = Color3.fromRGB(0, 140, 255), Transparency = 1 },
+        Murder   = { Enabled = false, Color = Color3.fromRGB(255, 30, 60), Transparency = 1 }
+    },
+    Aura = { Enabled = false, Color = Color3.fromRGB(180, 0, 255), Transparency = 0.5, Neon = false }
 }
 
 -- Tab Button
@@ -317,7 +338,7 @@ ContentList.SortOrder = Enum.SortOrder.LayoutOrder
 ContentList.Parent = TabContent
 
 ContentList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    TabContent.CanvasSize = UDim2.new(0, 0, 0, ContentList.AbsoluteContentSize.Y + 10)
+    TabContent.CanvasSize = UDim2.new(0, 0, 0, ContentList.AbsoluteContentSize.Y + 15)
 end)
 
 local PaletteColors = {
@@ -329,8 +350,8 @@ local PaletteColors = {
     Color3.fromRGB(255, 255, 255)
 }
 
--- Helper: Create Role & Gun Section
-local function CreateESPSection(roleKey, titleText, isGunSection)
+-- UI Builder Helper
+local function CreateSubSection(cfgRef, titleText, isGun, isAura)
     local sectionFrame = Instance.new("Frame")
     sectionFrame.Size = UDim2.new(1, -8, 0, 38)
     sectionFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
@@ -352,7 +373,7 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
     topToggle.Parent = sectionFrame
     
     local titleLbl = Instance.new("TextLabel")
-    titleLbl.Size = UDim2.new(0.6, 0, 1, 0)
+    titleLbl.Size = UDim2.new(0.65, 0, 1, 0)
     titleLbl.Position = UDim2.new(0, 12, 0, 0)
     titleLbl.BackgroundTransparency = 1
     titleLbl.Text = titleText
@@ -394,7 +415,7 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
     expandBtn.Parent = topToggle
     
     local subPanel = Instance.new("Frame")
-    subPanel.Size = UDim2.new(1, -20, 0, isGunSection and 145 or 110)
+    subPanel.Size = UDim2.new(1, -20, 0, isGun and 145 or (isAura and 145 or 110))
     subPanel.Position = UDim2.new(0, 10, 0, 42)
     subPanel.BackgroundTransparency = 1
     subPanel.Parent = sectionFrame
@@ -402,7 +423,7 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
     local colorLbl = Instance.new("TextLabel")
     colorLbl.Size = UDim2.new(1, 0, 0, 20)
     colorLbl.BackgroundTransparency = 1
-    colorLbl.Text = "Outline Color (Палитра):"
+    colorLbl.Text = "Color (Палитра):"
     colorLbl.Font = Enum.Font.Gotham
     colorLbl.TextSize = 12
     colorLbl.TextColor3 = Color3.fromRGB(170, 170, 170)
@@ -412,7 +433,7 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
     local colorPreview = Instance.new("Frame")
     colorPreview.Size = UDim2.new(0, 22, 0, 22)
     colorPreview.Position = UDim2.new(1, -22, 0, 0)
-    colorPreview.BackgroundColor3 = ESP_Settings[roleKey].Color
+    colorPreview.BackgroundColor3 = cfgRef.Color
     colorPreview.Parent = subPanel
     
     local prevCorner = Instance.new("UICorner")
@@ -442,7 +463,7 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
         pCorner.Parent = pBtn
         
         pBtn.MouseButton1Click:Connect(function()
-            ESP_Settings[roleKey].Color = col
+            cfgRef.Color = col
             colorPreview.BackgroundColor3 = col
         end)
     end
@@ -451,7 +472,7 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
     transLbl.Size = UDim2.new(1, 0, 0, 20)
     transLbl.Position = UDim2.new(0, 0, 0, 56)
     transLbl.BackgroundTransparency = 1
-    transLbl.Text = "Transparency Outline: 100%"
+    transLbl.Text = "Transparency: " .. math.floor(cfgRef.Transparency * 100) .. "%"
     transLbl.Font = Enum.Font.Gotham
     transLbl.TextSize = 12
     transLbl.TextColor3 = Color3.fromRGB(170, 170, 170)
@@ -469,7 +490,7 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
     sBgCorner.Parent = sliderBg
     
     local sliderFill = Instance.new("Frame")
-    sliderFill.Size = UDim2.new(1, 0, 1, 0)
+    sliderFill.Size = UDim2.new(cfgRef.Transparency, 0, 1, 0)
     sliderFill.BackgroundColor3 = Color3.fromRGB(255, 30, 60)
     sliderFill.Parent = sliderBg
     
@@ -482,8 +503,8 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
         local pos = math.clamp((input.Position.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0, 1)
         sliderFill.Size = UDim2.new(pos, 0, 1, 0)
         local percent = math.floor(pos * 100)
-        transLbl.Text = "Transparency Outline: " .. percent .. "%"
-        ESP_Settings[roleKey].Transparency = pos
+        transLbl.Text = "Transparency: " .. percent .. "%"
+        cfgRef.Transparency = pos
     end
     
     sliderBg.InputBegan:Connect(function(input)
@@ -496,7 +517,7 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then sliding = false end
     end)
     
-    if isGunSection then
+    if isGun then
         local alertLbl = Instance.new("TextLabel")
         alertLbl.Size = UDim2.new(0.7, 0, 0, 22)
         alertLbl.Position = UDim2.new(0, 0, 0, 108)
@@ -530,16 +551,55 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
         adCorner.Parent = aDot
         
         alertBtn.MouseButton1Click:Connect(function()
-            ESP_Settings.Gun.AlertEnabled = not ESP_Settings.Gun.AlertEnabled
-            local st = ESP_Settings.Gun.AlertEnabled
+            cfgRef.AlertEnabled = not cfgRef.AlertEnabled
+            local st = cfgRef.AlertEnabled
             TweenService:Create(alertBtn, TweenInfo.new(0.2), {BackgroundColor3 = st and Color3.fromRGB(255, 200, 0) or Color3.fromRGB(40, 40, 50)}):Play()
             TweenService:Create(aDot, TweenInfo.new(0.2), {Position = st and UDim2.new(1, -15, 0.5, -6) or UDim2.new(0, 3, 0.5, -6), BackgroundColor3 = st and Color3.fromRGB(20, 20, 20) or Color3.fromRGB(150, 150, 150)}):Play()
+        end)
+    elseif isAura then
+        local neonLbl = Instance.new("TextLabel")
+        neonLbl.Size = UDim2.new(0.7, 0, 0, 22)
+        neonLbl.Position = UDim2.new(0, 0, 0, 108)
+        neonLbl.BackgroundTransparency = 1
+        neonLbl.Text = "Neon Glow (Неоновый блеск)"
+        neonLbl.Font = Enum.Font.GothamMedium
+        neonLbl.TextSize = 12
+        neonLbl.TextColor3 = Color3.fromRGB(200, 200, 200)
+        neonLbl.TextXAlignment = Enum.TextXAlignment.Left
+        neonLbl.Parent = subPanel
+        
+        local neonBtn = Instance.new("TextButton")
+        neonBtn.Size = UDim2.new(0, 36, 0, 18)
+        neonBtn.Position = UDim2.new(1, -36, 0, 110)
+        neonBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+        neonBtn.Text = ""
+        neonBtn.Parent = subPanel
+        
+        local nCorner = Instance.new("UICorner")
+        nCorner.CornerRadius = UDim.new(1, 0)
+        nCorner.Parent = neonBtn
+        
+        local nDot = Instance.new("Frame")
+        nDot.Size = UDim2.new(0, 12, 0, 12)
+        nDot.Position = UDim2.new(0, 3, 0.5, -6)
+        nDot.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+        nDot.Parent = neonBtn
+        
+        local ndCorner = Instance.new("UICorner")
+        ndCorner.CornerRadius = UDim.new(1, 0)
+        ndCorner.Parent = nDot
+        
+        neonBtn.MouseButton1Click:Connect(function()
+            cfgRef.Neon = not cfgRef.Neon
+            local st = cfgRef.Neon
+            TweenService:Create(neonBtn, TweenInfo.new(0.2), {BackgroundColor3 = st and Color3.fromRGB(180, 0, 255) or Color3.fromRGB(40, 40, 50)}):Play()
+            TweenService:Create(nDot, TweenInfo.new(0.2), {Position = st and UDim2.new(1, -15, 0.5, -6) or UDim2.new(0, 3, 0.5, -6), BackgroundColor3 = st and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)}):Play()
         end)
     end
     
     toggleBtn.MouseButton1Click:Connect(function()
-        ESP_Settings[roleKey].Enabled = not ESP_Settings[roleKey].Enabled
-        local active = ESP_Settings[roleKey].Enabled
+        cfgRef.Enabled = not cfgRef.Enabled
+        local active = cfgRef.Enabled
         TweenService:Create(toggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = active and Color3.fromRGB(255, 30, 60) or Color3.fromRGB(40, 40, 50)}):Play()
         TweenService:Create(togDot, TweenInfo.new(0.2), {Position = active and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8), BackgroundColor3 = active and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)}):Play()
     end)
@@ -549,18 +609,45 @@ local function CreateESPSection(roleKey, titleText, isGunSection)
         expanded = not expanded
         expandBtn.Text = expanded and "▲" or "▼"
         secStroke.Color = expanded and Color3.fromRGB(255, 30, 60) or Color3.fromRGB(45, 45, 55)
-        local targetHeight = expanded and (isGunSection and 195 or 160) or 38
+        local targetHeight = expanded and ((isGun or isAura) and 195 or 160) or 38
         TweenService:Create(sectionFrame, TweenInfo.new(0.25), {Size = UDim2.new(1, -8, 0, targetHeight)}):Play()
     end)
 end
 
-CreateESPSection("Innocent", "Outline Innocent", false)
-CreateESPSection("Sheriff", "ESP Sheriff", false)
-CreateESPSection("Murder", "ESP Murder", false)
-CreateESPSection("Gun", "ESP Gun", true)
+-- Category Titles
+local function CreateHeader(text)
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, 0, 0, 20)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = "--- " .. text .. " ---"
+    lbl.Font = Enum.Font.GothamBold
+    lbl.TextSize = 12
+    lbl.TextColor3 = Color3.fromRGB(255, 30, 60)
+    lbl.Parent = TabContent
+end
+
+-- Create Sections
+CreateHeader("OUTLINES")
+CreateSubSection(Config.Outlines.Innocent, "Outline Innocent", false, false)
+CreateSubSection(Config.Outlines.Sheriff, "ESP Sheriff", false, false)
+CreateSubSection(Config.Outlines.Murder, "ESP Murder", false, false)
+CreateSubSection(Config.Outlines.Gun, "ESP Gun", true, false)
+
+CreateHeader("TRACERS")
+CreateSubSection(Config.Tracers.Innocent, "Tracer Innocent", false, false)
+CreateSubSection(Config.Tracers.Sheriff, "Tracer Sheriff", false, false)
+CreateSubSection(Config.Tracers.Murder, "Tracer Murder", false, false)
+
+CreateHeader("BOXES")
+CreateSubSection(Config.Boxes.Innocent, "Box Innocent", false, false)
+CreateSubSection(Config.Boxes.Sheriff, "Box Sheriff", false, false)
+CreateSubSection(Config.Boxes.Murder, "Box Murder", false, false)
+
+CreateHeader("EFFECTS")
+CreateSubSection(Config.Aura, "Player Aura Effect", false, true)
 
 -- ==========================================
--- OPTIMIZED MM2 ROLE & GUN ESP SYSTEM
+-- LOGIC & VISUAL RENDER LOOPS
 -- ==========================================
 local function GetPlayerRole(plr)
     if not plr or not plr.Character then return "Innocent" end
@@ -582,30 +669,34 @@ local function GetDroppedGun()
             return obj
         end
     end
-    -- Запасной поиск во вложенных папках
-    for _, obj in pairs(workspace:GetDescendants()) do
-        if obj.Name == "GunDrop" then
-            return obj
-        end
-    end
     return nil
 end
 
-local gunWasOnMap = false
+local TracerGUIElements = {}
+local BoxGUIElements = {}
 
--- Throttle-цикл (выполняется 10 раз в секунду вместо 60-140)
+-- Clean GUI Elements
+local function ClearDrawings()
+    DrawingCanvas:ClearAllChildren()
+    TracerGUIElements = {}
+    BoxGUIElements = {}
+end
+
+-- Throttle Loop (Outlines, Gun Alert & Aura) - 10 times/sec
+local gunWasOnMap = false
 task.spawn(function()
     while task.wait(0.1) do
         if not ScreenGui.Parent then break end
         
-        -- 1. Player ESP Update
+        -- Outlines & Aura
         for _, plr in pairs(Players:GetPlayers()) do
             if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
                 local role = GetPlayerRole(plr)
-                local cfg = ESP_Settings[role]
                 
+                -- Outlines
+                local cfgO = Config.Outlines[role]
                 local hl = plr.Character:FindFirstChild("QuatroESP")
-                if cfg and cfg.Enabled and cfg.Transparency > 0 then
+                if cfgO and cfgO.Enabled and cfgO.Transparency > 0 then
                     if not hl then
                         hl = Instance.new("Highlight")
                         hl.Name = "QuatroESP"
@@ -613,41 +704,126 @@ task.spawn(function()
                     end
                     hl.Adornee = plr.Character
                     hl.FillTransparency = 1
-                    hl.OutlineColor = cfg.Color
-                    hl.OutlineTransparency = 1 - cfg.Transparency
+                    hl.OutlineColor = cfgO.Color
+                    hl.OutlineTransparency = 1 - cfgO.Transparency
                 else
                     if hl then hl:Destroy() end
+                end
+                
+                -- Aura Effect
+                local cfgA = Config.Aura
+                local auraP = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("QuatroAura")
+                if cfgA.Enabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    if not auraP then
+                        local part = Instance.new("Part")
+                        part.Name = "QuatroAura"
+                        part.Shape = Enum.PartType.Ball
+                        part.Size = Vector3.new(8, 8, 8)
+                        part.CanCollide = false
+                        part.Anchored = false
+                        part.Material = cfgA.Neon and Enum.Material.Neon or Enum.Material.SmoothPlastic
+                        
+                        local weld = Instance.new("Weld")
+                        weld.Part0 = LocalPlayer.Character.HumanoidRootPart
+                        weld.Part1 = part
+                        weld.Parent = part
+                        
+                        part.Parent = LocalPlayer.Character
+                        auraP = part
+                    end
+                    auraP.Color = cfgA.Color
+                    auraP.Transparency = 1 - cfgA.Transparency
+                    auraP.Material = cfgA.Neon and Enum.Material.Neon or Enum.Material.SmoothPlastic
+                else
+                    if auraP then auraP:Destroy() end
                 end
             end
         end
         
-        -- 2. Gun ESP & Alert Update
+        -- Gun ESP & Alert
         local droppedGun = GetDroppedGun()
         if droppedGun then
             if not gunWasOnMap then
                 gunWasOnMap = true
-                if ESP_Settings.Gun.AlertEnabled then
-                    ShowGunAlert()
-                end
+                if Config.Outlines.Gun.AlertEnabled then ShowGunAlert() end
             end
             
-            local cfg = ESP_Settings.Gun
-            local hl = droppedGun:FindFirstChild("QuatroGunESP")
-            if cfg.Enabled and cfg.Transparency > 0 then
-                if not hl then
-                    hl = Instance.new("Highlight")
-                    hl.Name = "QuatroGunESP"
-                    hl.Parent = droppedGun
+            local cfgG = Config.Outlines.Gun
+            local hlG = droppedGun:FindFirstChild("QuatroGunESP")
+            if cfgG.Enabled and cfgG.Transparency > 0 then
+                if not hlG then
+                    hlG = Instance.new("Highlight")
+                    hlG.Name = "QuatroGunESP"
+                    hlG.Parent = droppedGun
                 end
-                hl.Adornee = droppedGun
-                hl.FillTransparency = 1
-                hl.OutlineColor = cfg.Color
-                hl.OutlineTransparency = 1 - cfg.Transparency
+                hlG.Adornee = droppedGun
+                hlG.FillTransparency = 1
+                hlG.OutlineColor = cfgG.Color
+                hlG.OutlineTransparency = 1 - cfgG.Transparency
             else
-                if hl then hl:Destroy() end
+                if hlG then hlG:Destroy() end
             end
         else
             gunWasOnMap = false
+        end
+    end
+end)
+
+-- RenderStepped for Tracers & Boxes (Smooth Drawing)
+RunService.RenderStepped:Connect(function()
+    ClearDrawings()
+    
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local role = GetPlayerRole(plr)
+            local hrp = plr.Character.HumanoidRootPart
+            local head = plr.Character:FindFirstChild("Head") or hrp
+            
+            local pos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
+            
+            if onScreen then
+                -- Tracers
+                local cfgT = Config.Tracers[role]
+                if cfgT and cfgT.Enabled and cfgT.Transparency > 0 then
+                    local line = Instance.new("Frame")
+                    line.BorderSizePixel = 0
+                    line.BackgroundColor3 = cfgT.Color
+                    line.BackgroundTransparency = 1 - cfgT.Transparency
+                    
+                    local startPos = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)
+                    local endPos = Vector2.new(pos.X, pos.Y)
+                    local distance = (endPos - startPos).Magnitude
+                    local angle = math.atan2(endPos.Y - startPos.Y, endPos.X - startPos.X)
+                    
+                    line.Size = UDim2.new(0, distance, 0, 1.5)
+                    line.Position = UDim2.new(0, startPos.X, 0, startPos.Y)
+                    line.Rotation = math.deg(angle)
+                    line.AnchorPoint = Vector2.new(0, 0.5)
+                    line.Parent = DrawingCanvas
+                end
+                
+                -- Boxes
+                local cfgB = Config.Boxes[role]
+                if cfgB and cfgB.Enabled and cfgB.Transparency > 0 then
+                    local headPos = Camera:WorldToViewportPoint(head.Position + Vector3.new(0, 0.8, 0))
+                    local legPos = Camera:WorldToViewportPoint(hrp.Position - Vector3.new(0, 3, 0))
+                    
+                    local height = math.abs(headPos.Y - legPos.Y)
+                    local width = height / 1.6
+                    
+                    local box = Instance.new("Frame")
+                    box.Size = UDim2.new(0, width, 0, height)
+                    box.Position = UDim2.new(0, pos.X - width / 2, 0, pos.Y - height / 2)
+                    box.BackgroundTransparency = 1
+                    box.Parent = DrawingCanvas
+                    
+                    local stroke = Instance.new("UIStroke")
+                    stroke.Color = cfgB.Color
+                    stroke.Transparency = 1 - cfgB.Transparency
+                    stroke.Thickness = 1.5
+                    stroke.Parent = box
+                end
+            end
         end
     end
 end)
