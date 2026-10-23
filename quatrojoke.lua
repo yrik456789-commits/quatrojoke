@@ -1,4 +1,4 @@
--- [[ quatrojoke Script | Feathered Angel Wings & Full MM2 Suite ]] --
+-- [[ quatrojoke Script | 3D Volumetric Feather Wings Edition ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -219,7 +219,7 @@ StatusLabel.Parent = IntroFrame
 
 math.randomseed(os.time())
 local loadTime = math.random(4, 14)
-local statuses = {"Загрузка перьевых крыльев...", "Настройка анимированного веера...", "Оптимизация Visuals...", "Запуск quatrojoke..."}
+local statuses = {"Построение 3D-крыльев...", "Генерация перьевого каркаса...", "Оптимизация кадров...", "Запуск quatrojoke..."}
 
 task.spawn(function()
     local elapsed = 0
@@ -261,15 +261,8 @@ GunAlertFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
 GunAlertFrame.BorderSizePixel = 0
 GunAlertFrame.Parent = ScreenGui
 
-local AlertCorner = Instance.new("UICorner")
-AlertCorner.CornerRadius = UDim.new(0, 8)
-AlertCorner.Parent = GunAlertFrame
-
-local AlertStroke = Instance.new("UIStroke")
-AlertStroke.Color = Color3.fromRGB(255, 200, 0)
-AlertStroke.Thickness = 2
-AlertStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-AlertStroke.Parent = GunAlertFrame
+local AlertCorner = Instance.new("UICorner") AlertCorner.CornerRadius = UDim.new(0, 8) AlertCorner.Parent = GunAlertFrame
+local AlertStroke = Instance.new("UIStroke") AlertStroke.Color = Color3.fromRGB(255, 200, 0) AlertStroke.Thickness = 2 AlertStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border AlertStroke.Parent = GunAlertFrame
 
 local AlertText = Instance.new("TextLabel")
 AlertText.Size = UDim2.new(1, 0, 1, 0)
@@ -348,10 +341,7 @@ local function CreateTab(name)
     container.Visible = false
     container.Parent = ContentArea
     
-    local layout = Instance.new("UIListLayout")
-    layout.Padding = UDim.new(0, 8)
-    layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Parent = container
+    local layout = Instance.new("UIListLayout") layout.Padding = UDim.new(0, 8) layout.SortOrder = Enum.SortOrder.LayoutOrder layout.Parent = container
     
     layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         container.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 20)
@@ -615,7 +605,7 @@ CreateSection(TabVisuals, Config.Boxes.Murder, "Box Murder")
 CreateHeader(TabFX, "PLAYER AURA")
 CreateSection(TabFX, Config.Aura, "Player Aura Effect")
 
-CreateHeader(TabFX, "REALISTIC ANGEL WINGS")
+CreateHeader(TabFX, "3D VOLUMETRIC ANGEL WINGS")
 CreateSection(TabFX, Config.Angel, "Angel Wings Effect")
 
 -- Populate Movement Tab
@@ -732,7 +722,7 @@ CreateSection(TabMove, Config.Movement.Spin, "Spin (Вращение)", {
 CreateSection(TabMove, Config.Movement.Noclip, "Noclip (Сквозь стены)", {Color = false, Transparency = false, ExpandedHeight = 40})
 
 -- ==========================================
--- REALISTIC 36-FEATHER WINGS ARCHITECTURE
+-- 3D VOLUMETRIC FEATHERED WINGS ARCHITECTURE
 -- ==========================================
 local function GetPlayerRole(plr)
     if not plr or not plr.Character then return "Innocent" end
@@ -752,7 +742,7 @@ local function GetDroppedGun()
     return nil
 end
 
--- Create 6 Spiral Aura Particles
+-- Create Spiral Aura
 local auraBars = {}
 for i = 1, 6 do
     local bar = Instance.new("Part")
@@ -765,30 +755,31 @@ for i = 1, 6 do
     table.insert(auraBars, bar)
 end
 
--- Create Realistic Layered Curved Feathers (36 Parts total)
-local wingFeathers = {}
-for side = -1, 1, 2 do -- -1 (Left), 1 (Right)
-    for row = 1, 3 do -- 3 Rows (Bottom, Middle, Outer Long)
-        for i = 1, 6 do -- 6 Feathers per row
+-- Create 44 Volumetric Feathers with Curved Meshes
+local wing3DFeathers = {}
+for side = -1, 1, 2 do -- -1 Left, 1 Right
+    for layer = 1, 4 do -- 4 Volumetric Layers (Dense Base to Long Outer Wings)
+        for i = 1, 5 do -- 5 Main feathers per layer
             local feather = Instance.new("Part")
-            local length = (row == 1 and 0.8) or (row == 2 and 1.5) or (2.2 + (i * 0.25))
-            feather.Size = Vector3.new(0.25, length, 0.08)
             feather.CanCollide = false
             feather.Anchored = true
-            feather.Material = Enum.Material.Neon
+            feather.Material = Enum.Material.SmoothPlastic
             feather.Transparency = 1
             feather.Parent = FXContainer
             
-            -- Smooth cylinder/mesh shape
+            -- Volumetric 3D Wedge Mesh for realistic feather shape
             local mesh = Instance.new("SpecialMesh")
-            mesh.MeshType = Enum.MeshType.Head
-            mesh.Scale = Vector3.new(0.6, 1, 0.2)
+            mesh.MeshType = Enum.MeshType.Wedge
+            
+            local len = (layer == 1 and 0.9) or (layer == 2 and 1.6) or (layer == 3 and 2.4) or (3.2 + (i * 0.35))
+            local width = (layer == 1 and 0.4) or (0.35)
+            mesh.Scale = Vector3.new(0.12, len, width)
             mesh.Parent = feather
             
-            table.insert(wingFeathers, {
+            table.insert(wing3DFeathers, {
                 Part = feather,
                 Side = side,
-                Row = row,
+                Layer = layer,
                 Index = i
             })
         end
@@ -796,7 +787,7 @@ for side = -1, 1, 2 do -- -1 (Left), 1 (Right)
 end
 
 -- ==========================================
--- FLY & RENDER ENGINE
+-- ENGINE LOOP
 -- ==========================================
 local auraAngle = 0
 local wingFlap = 0
@@ -809,7 +800,7 @@ RunService.RenderStepped:Connect(function()
     local hrp = char and char:FindFirstChild("HumanoidRootPart")
     local hum = char and char:FindFirstChild("Humanoid")
     
-    -- 1. Fly
+    -- 1. Fly System
     if Config.Movement.Fly.Enabled and hrp and hum then
         bodyVel.Parent = hrp
         bodyGyro.Parent = hrp
@@ -851,35 +842,35 @@ RunService.RenderStepped:Connect(function()
         for _, bar in ipairs(auraBars) do bar.Transparency = 1 end
     end
     
-    -- 3. Realistic Curved Angel Wings Motion (Anatomical Arch)
+    -- 3. Realistic Volumetric Curved Wings (Anatomical Arch Motion)
     local cfgW = Config.Angel
     if cfgW.Enabled and hrp then
         local isMoving = (hum and hum.MoveDirection.Magnitude > 0) or Config.Movement.Fly.Enabled
-        wingFlap = wingFlap + (isMoving and 0.09 or 0.04) -- Динамический взмах
-        local flapOffset = math.sin(wingFlap) * (isMoving and 0.45 or 0.18)
+        wingFlap = wingFlap + (isMoving and 0.08 or 0.035)
+        local flapRad = math.sin(wingFlap) * (isMoving and 0.35 or 0.15)
         
-        for _, fData in ipairs(wingFeathers) do
+        for _, fData in ipairs(wing3DFeathers) do
             local p = fData.Part
             local side = fData.Side
-            local row = fData.Row
+            local layer = fData.Layer
             local i = fData.Index
             
-            -- Расчет веерного дугообразного размаха
-            local curveSpread = (i / 6) * math.rad(70)
-            local spanX = side * (0.6 + (i * 0.35) + (row * 0.1))
-            local spanY = 0.5 + (i * 0.25) - (row * 0.3) + flapOffset
-            local spanZ = 0.6 + (row * 0.1) + (i * 0.05)
+            -- Анатомический дугообразный веер крыла[cite: 1]
+            local archX = side * (0.5 + (i * 0.42) + (layer * 0.12))
+            local archY = 0.6 + (i * 0.38) - (layer * 0.35) + flapRad
+            local archZ = 0.6 + (layer * 0.18) + (i * 0.08)
             
-            local rotX = math.rad(-15 + (i * 5))
-            local rotY = side * (math.rad(30 + i * 8) + (flapOffset * 20))
-            local rotZ = side * (math.rad(-35 - i * 6) + (flapOffset * 15))
+            -- Углы перьев для создания объёма и естественного изгиба[cite: 1]
+            local rotX = math.rad(-20 + (i * 6))
+            local rotY = side * (math.rad(35 + i * 10) + (flapRad * 25))
+            local rotZ = side * (math.rad(-45 - i * 8) + (flapRad * 18))
             
-            p.CFrame = hrp.CFrame * CFrame.new(spanX, spanY, spanZ) * CFrame.Angles(rotX, rotY, rotZ)
+            p.CFrame = hrp.CFrame * CFrame.new(archX, archY, archZ) * CFrame.Angles(rotX, rotY, rotZ)
             p.Color = cfgW.Color
             p.Transparency = 1 - cfgW.Transparency
         end
     else
-        for _, fData in ipairs(wingFeathers) do fData.Part.Transparency = 1 end
+        for _, fData in ipairs(wing3DFeathers) do fData.Part.Transparency = 1 end
     end
     
     -- 4. Spin
