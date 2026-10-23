@@ -1,4 +1,4 @@
--- [[ quatrojoke Script | Smooth Motion 3D Angel Wings Edition ]] --
+-- [[ quatrojoke Script | Tung Tung Sahur Update ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -49,15 +49,8 @@ MainFrame.ClipsDescendants = true
 MainFrame.Visible = false
 MainFrame.Parent = ScreenGui
 
-local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 10)
-MainCorner.Parent = MainFrame
-
-local MainStroke = Instance.new("UIStroke")
-MainStroke.Color = Color3.fromRGB(255, 30, 60)
-MainStroke.Thickness = 2
-MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-MainStroke.Parent = MainFrame
+local MainCorner = Instance.new("UICorner") MainCorner.CornerRadius = UDim.new(0, 10) MainCorner.Parent = MainFrame
+local MainStroke = Instance.new("UIStroke") MainStroke.Color = Color3.fromRGB(255, 30, 60) MainStroke.Thickness = 2 MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border MainStroke.Parent = MainFrame
 
 -- Top Bar
 local TopBar = Instance.new("Frame")
@@ -88,9 +81,7 @@ CloseBtn.TextColor3 = Color3.fromRGB(255, 60, 80)
 CloseBtn.TextSize = 13
 CloseBtn.Parent = TopBar
 
-local CloseCorner = Instance.new("UICorner")
-CloseCorner.CornerRadius = UDim.new(0, 6)
-CloseCorner.Parent = CloseBtn
+local CloseCorner = Instance.new("UICorner") CloseCorner.CornerRadius = UDim.new(0, 6) CloseCorner.Parent = CloseBtn
 
 CloseBtn.MouseButton1Click:Connect(function() 
     FXContainer:Destroy()
@@ -124,16 +115,8 @@ SideBar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
 SideBar.BorderSizePixel = 0
 SideBar.Parent = MainFrame
 
-local SideList = Instance.new("UIListLayout")
-SideList.Padding = UDim.new(0, 6)
-SideList.SortOrder = Enum.SortOrder.LayoutOrder
-SideList.Parent = SideBar
-
-local SidePadding = Instance.new("UIPadding")
-SidePadding.PaddingTop = UDim.new(0, 8)
-SidePadding.PaddingLeft = UDim.new(0, 8)
-SidePadding.PaddingRight = UDim.new(0, 8)
-SidePadding.Parent = SideBar
+local SideList = Instance.new("UIListLayout") SideList.Padding = UDim.new(0, 6) SideList.SortOrder = Enum.SortOrder.LayoutOrder SideList.Parent = SideBar
+local SidePadding = Instance.new("UIPadding") SidePadding.PaddingTop = UDim.new(0, 8) SidePadding.PaddingLeft = UDim.new(0, 8) SidePadding.PaddingRight = UDim.new(0, 8) SidePadding.Parent = SideBar
 
 -- Content Area
 local ContentArea = Instance.new("Frame")
@@ -202,7 +185,7 @@ StatusLabel.Parent = IntroFrame
 
 math.randomseed(os.time())
 local loadTime = math.random(4, 14)
-local statuses = {"Плавная настройка физики...", "Сглаживание крыльев...", "Оптимизация...", "Запуск quatrojoke..."}
+local statuses = {"Загрузка Tung Tung Sahur...", "Скрытие оригинального тела...", "Подключение анимации...", "Запуск quatrojoke..."}
 
 task.spawn(function()
     local elapsed = 0
@@ -290,6 +273,7 @@ local Config = {
     },
     Aura = { Enabled = false, Color = Color3.fromRGB(255, 30, 60), Transparency = 0.8 },
     Angel = { Enabled = false, Color = Color3.fromRGB(255, 255, 255), Transparency = 0.8 },
+    TungTung = { Enabled = false }, -- Функция Tung Tung Sahur
     Movement = {
         Fly = { Enabled = false, Speed = 50, BatmanAnim = false },
         Spin = { Enabled = false, Speed = 20 },
@@ -585,11 +569,12 @@ CreateSection(TabVisuals, Config.Boxes.Sheriff, "Box Sheriff")
 CreateSection(TabVisuals, Config.Boxes.Murder, "Box Murder")
 
 -- Populate Visual Effects Tab
-CreateHeader(TabFX, "PLAYER AURA")
-CreateSection(TabFX, Config.Aura, "Player Aura Effect")
+CreateHeader(TabFX, "MEME AVATARS")
+CreateSection(TabFX, Config.TungTung, "Tung Tung Sahur Model", {Color = false, Transparency = false, ExpandedHeight = 40})
 
-CreateHeader(TabFX, "3D VOLUMETRIC ANGEL WINGS")
-CreateSection(TabFX, Config.Angel, "Angel Wings Effect")
+CreateHeader(TabFX, "EFFECTS & AURA")
+CreateSection(TabFX, Config.Aura, "Player Aura Effect")
+CreateSection(TabFX, Config.Angel, "3D Volumetric Angel Wings")
 
 -- Populate Movement Tab
 CreateHeader(TabMove, "MOVEMENT MODES")
@@ -705,7 +690,7 @@ CreateSection(TabMove, Config.Movement.Spin, "Spin (Вращение)", {
 CreateSection(TabMove, Config.Movement.Noclip, "Noclip (Сквозь стены)", {Color = false, Transparency = false, ExpandedHeight = 40})
 
 -- ==========================================
--- REALISTIC 3D SMOOTH WINGS ENGINE
+-- TUNG TUNG SAHUR MODEL & EFFECTS ARCHITECTURE
 -- ==========================================
 local function GetPlayerRole(plr)
     if not plr or not plr.Character then return "Innocent" end
@@ -738,7 +723,7 @@ for i = 1, 6 do
     table.insert(auraBars, bar)
 end
 
--- Create Volumetric Feather Parts
+-- Create 3D Angel Wings Parts
 local wing3DFeathers = {}
 for side = -1, 1, 2 do
     for layer = 1, 4 do
@@ -762,6 +747,82 @@ for side = -1, 1, 2 do
                 Layer = layer,
                 Index = i
             })
+        end
+    end
+end
+
+-- Create Custom Tung Tung Sahur Model
+local tungModel = Instance.new("Model")
+tungModel.Name = "TungTungSahurModel"
+
+local woodColor = Color3.fromRGB(180, 115, 60)
+
+-- Main Wooden Pillar Body
+local tungBody = Instance.new("Part")
+tungBody.Size = Vector3.new(1.6, 4.2, 1.2)
+tungBody.Color = woodColor
+tungBody.Material = Enum.Material.Wood
+tungBody.CanCollide = false
+tungBody.Anchored = true
+tungBody.Parent = tungModel
+
+local bodyMesh = Instance.new("SpecialMesh")
+bodyMesh.MeshType = Enum.MeshType.Cylinder
+bodyMesh.Scale = Vector3.new(1, 1, 1)
+bodyMesh.Parent = tungBody
+
+-- Head Cap
+local tungHead = Instance.new("Part")
+tungHead.Size = Vector3.new(1.6, 0.6, 1.2)
+tungHead.Color = Color3.fromRGB(150, 90, 45)
+tungHead.Material = Enum.Material.Wood
+tungHead.CanCollide = false
+tungHead.Anchored = true
+tungHead.Parent = tungModel
+
+-- Eyes
+local eyeL = Instance.new("Part")
+eyeL.Size = Vector3.new(0.4, 0.4, 0.1)
+eyeL.Color = Color3.fromRGB(255, 255, 255)
+eyeL.Material = Enum.Material.SmoothPlastic
+eyeL.CanCollide = false eyeL.Anchored = true eyeL.Parent = tungModel
+
+local pupilL = Instance.new("Part")
+pupilL.Size = Vector3.new(0.2, 0.2, 0.12)
+pupilL.Color = Color3.fromRGB(10, 10, 10)
+pupilL.Material = Enum.Material.SmoothPlastic
+pupilL.CanCollide = false pupilL.Anchored = true pupilL.Parent = tungModel
+
+local eyeR = eyeL:Clone() eyeR.Parent = tungModel
+local pupilR = pupilL:Clone() pupilR.Parent = tungModel
+
+-- Legs
+local legL = Instance.new("Part")
+legL.Size = Vector3.new(0.35, 1.8, 0.35)
+legL.Color = woodColor
+legL.Material = Enum.Material.Wood
+legL.CanCollide = false legL.Anchored = true legL.Parent = tungModel
+
+local legR = legL:Clone() legR.Parent = tungModel
+
+-- Bat Tool
+local batPart = Instance.new("Part")
+batPart.Size = Vector3.new(0.3, 3.2, 0.3)
+batPart.Color = Color3.fromRGB(140, 80, 40)
+batPart.Material = Enum.Material.Wood
+batPart.CanCollide = false batPart.Anchored = true batPart.Parent = tungModel
+
+tungModel.Parent = FXContainer
+
+-- Helper for transparency
+local function SetCharTransparency(char, trans)
+    for _, v in pairs(char:GetDescendants()) do
+        if v:IsA("BasePart") or v:IsA("Decal") then
+            if v.Name ~= "HumanoidRootPart" then
+                v.Transparency = trans
+            end
+        elseif v:IsA("Accessory") and v:FindFirstChild("Handle") then
+            v.Handle.Transparency = trans
         end
     end
 end
@@ -801,10 +862,42 @@ RunService.RenderStepped:Connect(function()
     else
         bodyVel.MaxForce = Vector3.new(0, 0, 0)
         bodyGyro.MaxTorque = Vector3.new(0, 0, 0)
-        if hum and not Config.Movement.Fly.Enabled then hum.PlatformStand = false end
+        if hum and not Config.Movement.Fly.Enabled and not Config.TungTung.Enabled then hum.PlatformStand = false end
     end
     
-    -- 2. Spiral Aura
+    -- 2. Tung Tung Sahur Avatar & Animation Override
+    if Config.TungTung.Enabled and hrp and char then
+        SetCharTransparency(char, 1) -- Скрываем Roblox аватар
+        if hum then hum.PlatformStand = true end -- Отключаем анимацию ходьбы/прыжка
+        
+        -- Позиционирование Tung Tung Sahur
+        local cf = hrp.CFrame
+        tungBody.CFrame = cf * CFrame.new(0, 0.4, 0) * CFrame.Angles(0, math.rad(90), 0)
+        tungHead.CFrame = cf * CFrame.new(0, 2.4, 0) * CFrame.Angles(0, math.rad(90), 0)
+        
+        eyeL.CFrame = cf * CFrame.new(-0.35, 1.5, -0.6)
+        pupilL.CFrame = cf * CFrame.new(-0.35, 1.5, -0.65)
+        eyeR.CFrame = cf * CFrame.new(0.35, 1.5, -0.6)
+        pupilR.CFrame = cf * CFrame.new(0.35, 1.5, -0.65)
+        
+        legL.CFrame = cf * CFrame.new(-0.4, -1.8, 0)
+        legR.CFrame = cf * CFrame.new(0.4, -1.8, 0)
+        
+        batPart.CFrame = cf * CFrame.new(0.9, -0.6, -0.4) * CFrame.Angles(math.rad(25), 0, math.rad(-15))
+    else
+        if char then SetCharTransparency(char, 0) end
+        tungBody.CFrame = CFrame.new(0, -999, 0)
+        tungHead.CFrame = CFrame.new(0, -999, 0)
+        eyeL.CFrame = CFrame.new(0, -999, 0)
+        pupilL.CFrame = CFrame.new(0, -999, 0)
+        eyeR.CFrame = CFrame.new(0, -999, 0)
+        pupilR.CFrame = CFrame.new(0, -999, 0)
+        legL.CFrame = CFrame.new(0, -999, 0)
+        legR.CFrame = CFrame.new(0, -999, 0)
+        batPart.CFrame = CFrame.new(0, -999, 0)
+    end
+    
+    -- 3. Spiral Aura
     local cfgA = Config.Aura
     if cfgA.Enabled and hrp then
         auraAngle = auraAngle + 0.05
@@ -822,11 +915,11 @@ RunService.RenderStepped:Connect(function()
         for _, bar in ipairs(auraBars) do bar.Transparency = 1 end
     end
     
-    -- 3. Smooth Lerped Volumetric Wings (Без дерганий при ходьбе)
+    -- 4. Angel Wings
     local cfgW = Config.Angel
     if cfgW.Enabled and hrp then
         local isMoving = (hum and hum.MoveDirection.Magnitude > 0) or Config.Movement.Fly.Enabled
-        wingFlap = wingFlap + (isMoving and 0.05 or 0.025) -- Плавный ритм
+        wingFlap = wingFlap + (isMoving and 0.05 or 0.025)
         local flapRad = math.sin(wingFlap) * (isMoving and 0.25 or 0.1)
         
         for _, fData in ipairs(wing3DFeathers) do
@@ -844,8 +937,6 @@ RunService.RenderStepped:Connect(function()
             local rotZ = side * (math.rad(-45 - i * 8) + (flapRad * 12))
             
             local targetCF = hrp.CFrame * CFrame.new(archX, archY, archZ) * CFrame.Angles(rotX, rotY, rotZ)
-            
-            -- Плавное сглаживание движения (Lerp)
             p.CFrame = p.CFrame:Lerp(targetCF, 0.25)
             p.Color = cfgW.Color
             p.Transparency = 1 - cfgW.Transparency
@@ -854,19 +945,19 @@ RunService.RenderStepped:Connect(function()
         for _, fData in ipairs(wing3DFeathers) do fData.Part.Transparency = 1 end
     end
     
-    -- 4. Spin
+    -- 5. Spin
     if Config.Movement.Spin.Enabled and hrp then
         hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(Config.Movement.Spin.Speed), 0)
     end
     
-    -- 5. Noclip
+    -- 6. Noclip
     if Config.Movement.Noclip.Enabled and char then
         for _, v in pairs(char:GetDescendants()) do
             if v:IsA("BasePart") then v.CanCollide = false end
         end
     end
     
-    -- 6. Clean Canvas ESP
+    -- 7. Clean Canvas ESP
     DrawingCanvas:ClearAllChildren()
     for _, plr in pairs(Players:GetPlayers()) do
         if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
