@@ -1,21 +1,22 @@
--- [[ quatrojoke Script | FIXED & FULLY WORKING EDITION ]] --
+-- [[ quatrojoke Script | Ultimate MM2 Edition (Fly, Spin, Wings, Aura, Clean ESP) ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
+local Workspace = game:GetService("Workspace")
 
 local LocalPlayer = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
+local Camera = Workspace.CurrentCamera
 
 -- Защита от повторного запуска
 if CoreGui:FindFirstChild("QuatrojokeUI") then
     CoreGui:FindFirstChild("QuatrojokeUI"):Destroy()
 end
 
-if workspace:FindFirstChild("QuatroAuraContainer") then
-    workspace:FindFirstChild("QuatroAuraContainer"):Destroy()
+if Workspace:FindFirstChild("QuatroFXContainer") then
+    Workspace:FindFirstChild("QuatroFXContainer"):Destroy()
 end
 
 -- ==========================================
@@ -36,18 +37,18 @@ DrawingCanvas.Size = UDim2.new(1, 0, 1, 0)
 DrawingCanvas.BackgroundTransparency = 1
 DrawingCanvas.Parent = ScreenGui
 
--- Container for Animated Aura Particles
-local AuraContainer = Instance.new("Folder")
-AuraContainer.Name = "QuatroAuraContainer"
-AuraContainer.Parent = workspace
+-- Folder for 3D Visual Effects (Aura, Wings)
+local FXContainer = Instance.new("Folder")
+FXContainer.Name = "QuatroFXContainer"
+FXContainer.Parent = Workspace
 
 -- ==========================================
 -- MAIN GUI FRAME
 -- ==========================================
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 560, 0, 420)
-MainFrame.Position = UDim2.new(0.5, -280, 0.5, -210)
+MainFrame.Size = UDim2.new(0, 580, 0, 440)
+MainFrame.Position = UDim2.new(0.5, -290, 0.5, -220)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 MainFrame.BackgroundTransparency = 0.15
 MainFrame.BorderSizePixel = 0
@@ -99,11 +100,11 @@ CloseCorner.CornerRadius = UDim.new(0, 6)
 CloseCorner.Parent = CloseBtn
 
 CloseBtn.MouseButton1Click:Connect(function() 
-    AuraContainer:Destroy()
+    FXContainer:Destroy()
     ScreenGui:Destroy() 
 end)
 
--- Dragging
+-- Dragging Logic
 local dragging, dragStart, startPos
 TopBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -122,16 +123,16 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Sidebar (Left)
+-- Sidebar (Left Tabs)
 local SideBar = Instance.new("Frame")
-SideBar.Size = UDim2.new(0, 140, 1, -40)
+SideBar.Size = UDim2.new(0, 150, 1, -40)
 SideBar.Position = UDim2.new(0, 0, 0, 40)
 SideBar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
 SideBar.BorderSizePixel = 0
 SideBar.Parent = MainFrame
 
 local SideList = Instance.new("UIListLayout")
-SideList.Padding = UDim.new(0, 5)
+SideList.Padding = UDim.new(0, 6)
 SideList.SortOrder = Enum.SortOrder.LayoutOrder
 SideList.Parent = SideBar
 
@@ -143,18 +144,18 @@ SidePadding.Parent = SideBar
 
 -- Content Area (Right)
 local ContentArea = Instance.new("Frame")
-ContentArea.Size = UDim2.new(1, -140, 1, -40)
-ContentArea.Position = UDim2.new(0, 140, 0, 40)
+ContentArea.Size = UDim2.new(1, -150, 1, -40)
+ContentArea.Position = UDim2.new(0, 150, 0, 40)
 ContentArea.BackgroundTransparency = 1
 ContentArea.Parent = MainFrame
 
 -- ==========================================
--- INTRO FRAME
+-- INTRO FRAME (Centered 580x440)
 -- ==========================================
 local IntroFrame = Instance.new("Frame")
 IntroFrame.Name = "IntroFrame"
-IntroFrame.Size = UDim2.new(0, 560, 0, 420)
-IntroFrame.Position = UDim2.new(0.5, -280, 0.5, -210)
+IntroFrame.Size = UDim2.new(0, 580, 0, 440)
+IntroFrame.Position = UDim2.new(0.5, -290, 0.5, -220)
 IntroFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 IntroFrame.BackgroundTransparency = 0.05
 IntroFrame.ClipsDescendants = true
@@ -225,7 +226,7 @@ StatusLabel.Parent = IntroFrame
 
 math.randomseed(os.time())
 local loadTime = math.random(4, 14)
-local statuses = {"Исправление ошибок...", "Загрузка Visuals...", "Настройка неона...", "Оптимизация...", "Запуск quatrojoke..."}
+local statuses = {"Загрузка модулей...", "Настройка вкладок...", "Создание крыльев...", "Оптимизация...", "Запуск quatrojoke..."}
 
 task.spawn(function()
     local elapsed = 0
@@ -299,7 +300,7 @@ local function ShowGunAlert()
 end
 
 -- ==========================================
--- CONFIG
+-- FULL CONFIG DATA
 -- ==========================================
 local Config = {
     Outlines = {
@@ -318,40 +319,77 @@ local Config = {
         Sheriff  = { Enabled = false, Color = Color3.fromRGB(0, 140, 255), Transparency = 1 },
         Murder   = { Enabled = false, Color = Color3.fromRGB(255, 30, 60), Transparency = 1 }
     },
-    Aura = { Enabled = false, Color = Color3.fromRGB(255, 30, 60), Transparency = 0.8, Neon = true }
+    Aura = { Enabled = false, Color = Color3.fromRGB(255, 30, 60), Transparency = 0.8, Neon = true },
+    Angel = { Enabled = false, Color = Color3.fromRGB(0, 200, 255), Transparency = 0.5, Neon = true },
+    Movement = {
+        Fly = { Enabled = false, Speed = 50, BatmanAnim = false },
+        Spin = { Enabled = false, Speed = 20 },
+        Noclip = { Enabled = false }
+    }
 }
 
--- Tab Button
-local TabBtn = Instance.new("TextButton")
-TabBtn.Size = UDim2.new(1, 0, 0, 36)
-TabBtn.BackgroundColor3 = Color3.fromRGB(45, 20, 30)
-TabBtn.Text = "Visuals / ESP"
-TabBtn.Font = Enum.Font.GothamBold
-TabBtn.TextSize = 13
-TabBtn.TextColor3 = Color3.fromRGB(255, 30, 60)
-TabBtn.Parent = SideBar
+-- ==========================================
+-- TAB SYSTEM CREATION
+-- ==========================================
+local Tabs = {}
+local CurrentTab = nil
 
-local TabCorner = Instance.new("UICorner")
-TabCorner.CornerRadius = UDim.new(0, 6)
-TabCorner.Parent = TabBtn
+local function CreateTab(name)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 0, 36)
+    btn.BackgroundColor3 = Color3.fromRGB(25, 25, 34)
+    btn.Text = name
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 13
+    btn.TextColor3 = Color3.fromRGB(180, 180, 180)
+    btn.Parent = SideBar
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 6)
+    corner.Parent = btn
+    
+    local container = Instance.new("ScrollingFrame")
+    container.Size = UDim2.new(1, -16, 1, -16)
+    container.Position = UDim2.new(0, 8, 0, 8)
+    container.BackgroundTransparency = 1
+    container.ScrollBarThickness = 4
+    container.ScrollBarImageColor3 = Color3.fromRGB(255, 30, 60)
+    container.Visible = false
+    container.Parent = ContentArea
+    
+    local layout = Instance.new("UIListLayout")
+    layout.Padding = UDim.new(0, 8)
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Parent = container
+    
+    layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        container.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 15)
+    end)
+    
+    btn.MouseButton1Click:Connect(function()
+        for _, t in pairs(Tabs) do
+            t.Container.Visible = false
+            TweenService:Create(t.Button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 25, 34), TextColor3 = Color3.fromRGB(180, 180, 180)}):Play()
+        end
+        container.Visible = true
+        TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(45, 20, 30), TextColor3 = Color3.fromRGB(255, 30, 60)}):Play()
+        CurrentTab = container
+    end)
+    
+    local tabData = {Button = btn, Container = container}
+    table.insert(Tabs, tabData)
+    if not CurrentTab then
+        container.Visible = true
+        btn.BackgroundColor3 = Color3.fromRGB(45, 20, 30)
+        btn.TextColor3 = Color3.fromRGB(255, 30, 60)
+        CurrentTab = container
+    end
+    return container
+end
 
--- Scroll Content Frame
-local TabContent = Instance.new("ScrollingFrame")
-TabContent.Size = UDim2.new(1, -16, 1, -16)
-TabContent.Position = UDim2.new(0, 8, 0, 8)
-TabContent.BackgroundTransparency = 1
-TabContent.ScrollBarThickness = 4
-TabContent.ScrollBarImageColor3 = Color3.fromRGB(255, 30, 60)
-TabContent.Parent = ContentArea
-
-local ContentList = Instance.new("UIListLayout")
-ContentList.Padding = UDim.new(0, 8)
-ContentList.SortOrder = Enum.SortOrder.LayoutOrder
-ContentList.Parent = TabContent
-
-ContentList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    TabContent.CanvasSize = UDim2.new(0, 0, 0, ContentList.AbsoluteContentSize.Y + 15)
-end)
+local TabVisuals = CreateTab("Visuals / ESP")
+local TabFX = CreateTab("Visual Effects")
+local TabMove = CreateTab("Movement")
 
 local PaletteColors = {
     Color3.fromRGB(255, 30, 60),
@@ -362,13 +400,13 @@ local PaletteColors = {
     Color3.fromRGB(255, 255, 255)
 }
 
--- UI Builder Helper
-local function CreateSubSection(cfgRef, titleText, isGun, isAura)
+-- UI Section Builder Helper
+local function CreateSection(parentTab, cfgRef, titleText, options)
     local sectionFrame = Instance.new("Frame")
     sectionFrame.Size = UDim2.new(1, -8, 0, 38)
     sectionFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
     sectionFrame.ClipsDescendants = true
-    sectionFrame.Parent = TabContent
+    sectionFrame.Parent = parentTab
     
     local secCorner = Instance.new("UICorner")
     secCorner.CornerRadius = UDim.new(0, 6)
@@ -427,126 +465,174 @@ local function CreateSubSection(cfgRef, titleText, isGun, isAura)
     expandBtn.Parent = topToggle
     
     local subPanel = Instance.new("Frame")
-    subPanel.Size = UDim2.new(1, -20, 0, (isGun or isAura) and 145 or 110)
+    subPanel.Size = UDim2.new(1, -20, 0, 150)
     subPanel.Position = UDim2.new(0, 10, 0, 42)
     subPanel.BackgroundTransparency = 1
     subPanel.Parent = sectionFrame
     
-    local colorLbl = Instance.new("TextLabel")
-    colorLbl.Size = UDim2.new(1, 0, 0, 20)
-    colorLbl.BackgroundTransparency = 1
-    colorLbl.Text = "Color (Палитра):"
-    colorLbl.Font = Enum.Font.Gotham
-    colorLbl.TextSize = 12
-    colorLbl.TextColor3 = Color3.fromRGB(170, 170, 170)
-    colorLbl.TextXAlignment = Enum.TextXAlignment.Left
-    colorLbl.Parent = subPanel
+    options = options or {}
+    local hasColor = options.Color ~= false
+    local hasTrans = options.Transparency ~= false
+    local customSub = options.CustomSub
     
-    local colorPreview = Instance.new("Frame")
-    colorPreview.Size = UDim2.new(0, 22, 0, 22)
-    colorPreview.Position = UDim2.new(1, -22, 0, 0)
-    colorPreview.BackgroundColor3 = cfgRef.Color
-    colorPreview.Parent = subPanel
+    local yOffset = 0
     
-    local prevCorner = Instance.new("UICorner")
-    prevCorner.CornerRadius = UDim.new(0, 4)
-    prevCorner.Parent = colorPreview
-    
-    local paletteFrame = Instance.new("Frame")
-    paletteFrame.Size = UDim2.new(1, 0, 0, 26)
-    paletteFrame.Position = UDim2.new(0, 0, 0, 24)
-    paletteFrame.BackgroundTransparency = 1
-    paletteFrame.Parent = subPanel
-    
-    local palLayout = Instance.new("UIListLayout")
-    palLayout.FillDirection = Enum.FillDirection.Horizontal
-    palLayout.Padding = UDim.new(0, 6)
-    palLayout.Parent = paletteFrame
-    
-    for _, col in ipairs(PaletteColors) do
-        local pBtn = Instance.new("TextButton")
-        pBtn.Size = UDim2.new(0, 24, 0, 24)
-        pBtn.BackgroundColor3 = col
-        pBtn.Text = ""
-        pBtn.Parent = paletteFrame
+    if hasColor then
+        local colorLbl = Instance.new("TextLabel")
+        colorLbl.Size = UDim2.new(1, 0, 0, 20)
+        colorLbl.Position = UDim2.new(0, 0, 0, yOffset)
+        colorLbl.BackgroundTransparency = 1
+        colorLbl.Text = "Color (Палитра):"
+        colorLbl.Font = Enum.Font.Gotham
+        colorLbl.TextSize = 12
+        colorLbl.TextColor3 = Color3.fromRGB(170, 170, 170)
+        colorLbl.TextXAlignment = Enum.TextXAlignment.Left
+        colorLbl.Parent = subPanel
         
-        local pCorner = Instance.new("UICorner")
-        pCorner.CornerRadius = UDim.new(0, 4)
-        pCorner.Parent = pBtn
+        local colorPreview = Instance.new("Frame")
+        colorPreview.Size = UDim2.new(0, 22, 0, 22)
+        colorPreview.Position = UDim2.new(1, -22, 0, yOffset)
+        colorPreview.BackgroundColor3 = cfgRef.Color or Color3.fromRGB(255, 30, 60)
+        colorPreview.Parent = subPanel
         
-        pBtn.MouseButton1Click:Connect(function()
-            cfgRef.Color = col
-            colorPreview.BackgroundColor3 = col
+        local prevCorner = Instance.new("UICorner")
+        prevCorner.CornerRadius = UDim.new(0, 4)
+        prevCorner.Parent = colorPreview
+        
+        local paletteFrame = Instance.new("Frame")
+        paletteFrame.Size = UDim2.new(1, 0, 0, 26)
+        paletteFrame.Position = UDim2.new(0, 0, 0, yOffset + 24)
+        paletteFrame.BackgroundTransparency = 1
+        paletteFrame.Parent = subPanel
+        
+        local palLayout = Instance.new("UIListLayout")
+        palLayout.FillDirection = Enum.FillDirection.Horizontal
+        palLayout.Padding = UDim.new(0, 6)
+        palLayout.Parent = paletteFrame
+        
+        for _, col in ipairs(PaletteColors) do
+            local pBtn = Instance.new("TextButton")
+            pBtn.Size = UDim2.new(0, 24, 0, 24)
+            pBtn.BackgroundColor3 = col
+            pBtn.Text = ""
+            pBtn.Parent = paletteFrame
+            
+            local pCorner = Instance.new("UICorner")
+            pCorner.CornerRadius = UDim.new(0, 4)
+            pCorner.Parent = pBtn
+            
+            pBtn.MouseButton1Click:Connect(function()
+                cfgRef.Color = col
+                colorPreview.BackgroundColor3 = col
+            end)
+        end
+        yOffset = yOffset + 54
+    end
+    
+    if hasTrans then
+        local transLbl = Instance.new("TextLabel")
+        transLbl.Size = UDim2.new(1, 0, 0, 20)
+        transLbl.Position = UDim2.new(0, 0, 0, yOffset)
+        transLbl.BackgroundTransparency = 1
+        transLbl.Text = "Transparency: " .. math.floor((cfgRef.Transparency or 0.5) * 100) .. "%"
+        transLbl.Font = Enum.Font.Gotham
+        transLbl.TextSize = 12
+        transLbl.TextColor3 = Color3.fromRGB(170, 170, 170)
+        transLbl.TextXAlignment = Enum.TextXAlignment.Left
+        transLbl.Parent = subPanel
+        
+        local sliderBg = Instance.new("Frame")
+        sliderBg.Size = UDim2.new(1, 0, 0, 8)
+        sliderBg.Position = UDim2.new(0, 0, 0, yOffset + 24)
+        sliderBg.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+        sliderBg.Parent = subPanel
+        
+        local sBgCorner = Instance.new("UICorner")
+        sBgCorner.CornerRadius = UDim.new(1, 0)
+        sBgCorner.Parent = sliderBg
+        
+        local sliderFill = Instance.new("Frame")
+        sliderFill.Size = UDim2.new(cfgRef.Transparency or 0.5, 0, 1, 0)
+        sliderFill.BackgroundColor3 = Color3.fromRGB(255, 30, 60)
+        sliderFill.Parent = sliderBg
+        
+        local sFillCorner = Instance.new("UICorner")
+        sFillCorner.CornerRadius = UDim.new(1, 0)
+        sFillCorner.Parent = sliderFill
+        
+        local sliding = false
+        sliderBg.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then sliding = true end
         end)
+        UserInputService.InputChanged:Connect(function(input)
+            if sliding and input.UserInputType == Enum.UserInputType.MouseMovement then
+                local pos = math.clamp((input.Position.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0, 1)
+                sliderFill.Size = UDim2.new(pos, 0, 1, 0)
+                transLbl.Text = "Transparency: " .. math.floor(pos * 100) .. "%"
+                cfgRef.Transparency = pos
+            end
+        end)
+        UserInputService.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then sliding = false end
+        end)
+        yOffset = yOffset + 40
     end
     
-    local transLbl = Instance.new("TextLabel")
-    transLbl.Size = UDim2.new(1, 0, 0, 20)
-    transLbl.Position = UDim2.new(0, 0, 0, 56)
-    transLbl.BackgroundTransparency = 1
-    transLbl.Text = "Transparency: " .. math.floor(cfgRef.Transparency * 100) .. "%"
-    transLbl.Font = Enum.Font.Gotham
-    transLbl.TextSize = 12
-    transLbl.TextColor3 = Color3.fromRGB(170, 170, 170)
-    transLbl.TextXAlignment = Enum.TextXAlignment.Left
-    transLbl.Parent = subPanel
-    
-    local sliderBg = Instance.new("Frame")
-    sliderBg.Size = UDim2.new(1, 0, 0, 8)
-    sliderBg.Position = UDim2.new(0, 0, 0, 80)
-    sliderBg.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
-    sliderBg.Parent = subPanel
-    
-    local sBgCorner = Instance.new("UICorner")
-    sBgCorner.CornerRadius = UDim.new(1, 0)
-    sBgCorner.Parent = sliderBg
-    
-    local sliderFill = Instance.new("Frame")
-    sliderFill.Size = UDim2.new(cfgRef.Transparency, 0, 1, 0)
-    sliderFill.BackgroundColor3 = Color3.fromRGB(255, 30, 60)
-    sliderFill.Parent = sliderBg
-    
-    local sFillCorner = Instance.new("UICorner")
-    sFillCorner.CornerRadius = UDim.new(1, 0)
-    sFillCorner.Parent = sliderFill
-    
-    local sliding = false
-    local function UpdateSlider(input)
-        local pos = math.clamp((input.Position.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0, 1)
-        sliderFill.Size = UDim2.new(pos, 0, 1, 0)
-        local percent = math.floor(pos * 100)
-        transLbl.Text = "Transparency: " .. percent .. "%"
-        cfgRef.Transparency = pos
+    if customSub then
+        customSub(subPanel, yOffset)
     end
     
-    sliderBg.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then sliding = true UpdateSlider(input) end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if sliding and input.UserInputType == Enum.UserInputType.MouseMovement then UpdateSlider(input) end
-    end)
-    UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then sliding = false end
+    toggleBtn.MouseButton1Click:Connect(function()
+        cfgRef.Enabled = not cfgRef.Enabled
+        local active = cfgRef.Enabled
+        TweenService:Create(toggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = active and Color3.fromRGB(255, 30, 60) or Color3.fromRGB(40, 40, 50)}):Play()
+        TweenService:Create(togDot, TweenInfo.new(0.2), {Position = active and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8), BackgroundColor3 = active and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)}):Play()
     end)
     
-    if isGun then
+    local expanded = false
+    expandBtn.MouseButton1Click:Connect(function()
+        expanded = not expanded
+        expandBtn.Text = expanded and "▲" or "▼"
+        secStroke.Color = expanded and Color3.fromRGB(255, 30, 60) or Color3.fromRGB(45, 45, 55)
+        TweenService:Create(sectionFrame, TweenInfo.new(0.25), {Size = UDim2.new(1, -8, 0, expanded and 185 or 38)}):Play()
+    end)
+end
+
+local function CreateHeader(parentTab, text)
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, 0, 0, 20)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = "--- " .. text .. " ---"
+    lbl.Font = Enum.Font.GothamBold
+    lbl.TextSize = 12
+    lbl.TextColor3 = Color3.fromRGB(255, 30, 60)
+    lbl.Parent = parentTab
+end
+
+-- Populate Visuals Tab
+CreateHeader(TabVisuals, "OUTLINES")
+CreateSection(TabVisuals, Config.Outlines.Innocent, "Outline Innocent")
+CreateSection(TabVisuals, Config.Outlines.Sheriff, "ESP Sheriff")
+CreateSection(TabVisuals, Config.Outlines.Murder, "ESP Murder")
+CreateSection(TabVisuals, Config.Outlines.Gun, "ESP Gun", {
+    CustomSub = function(panel, y)
         local alertLbl = Instance.new("TextLabel")
         alertLbl.Size = UDim2.new(0.7, 0, 0, 22)
-        alertLbl.Position = UDim2.new(0, 0, 0, 108)
+        alertLbl.Position = UDim2.new(0, 0, 0, y)
         alertLbl.BackgroundTransparency = 1
         alertLbl.Text = "Сообщать что упал пистолет"
         alertLbl.Font = Enum.Font.GothamMedium
         alertLbl.TextSize = 12
         alertLbl.TextColor3 = Color3.fromRGB(200, 200, 200)
         alertLbl.TextXAlignment = Enum.TextXAlignment.Left
-        alertLbl.Parent = subPanel
+        alertLbl.Parent = panel
         
         local alertBtn = Instance.new("TextButton")
         alertBtn.Size = UDim2.new(0, 36, 0, 18)
-        alertBtn.Position = UDim2.new(1, -36, 0, 110)
+        alertBtn.Position = UDim2.new(1, -36, 0, y + 2)
         alertBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
         alertBtn.Text = ""
-        alertBtn.Parent = subPanel
+        alertBtn.Parent = panel
         
         local aCorner = Instance.new("UICorner")
         aCorner.CornerRadius = UDim.new(1, 0)
@@ -563,122 +649,88 @@ local function CreateSubSection(cfgRef, titleText, isGun, isAura)
         adCorner.Parent = aDot
         
         alertBtn.MouseButton1Click:Connect(function()
-            cfgRef.AlertEnabled = not cfgRef.AlertEnabled
-            local st = cfgRef.AlertEnabled
+            Config.Outlines.Gun.AlertEnabled = not Config.Outlines.Gun.AlertEnabled
+            local st = Config.Outlines.Gun.AlertEnabled
             TweenService:Create(alertBtn, TweenInfo.new(0.2), {BackgroundColor3 = st and Color3.fromRGB(255, 200, 0) or Color3.fromRGB(40, 40, 50)}):Play()
             TweenService:Create(aDot, TweenInfo.new(0.2), {Position = st and UDim2.new(1, -15, 0.5, -6) or UDim2.new(0, 3, 0.5, -6), BackgroundColor3 = st and Color3.fromRGB(20, 20, 20) or Color3.fromRGB(150, 150, 150)}):Play()
         end)
-    elseif isAura then
-        local neonLbl = Instance.new("TextLabel")
-        neonLbl.Size = UDim2.new(0.7, 0, 0, 22)
-        neonLbl.Position = UDim2.new(0, 0, 0, 108)
-        neonLbl.BackgroundTransparency = 1
-        neonLbl.Text = "Neon Glow (Неоновый блеск)"
-        neonLbl.Font = Enum.Font.GothamMedium
-        neonLbl.TextSize = 12
-        neonLbl.TextColor3 = Color3.fromRGB(200, 200, 200)
-        neonLbl.TextXAlignment = Enum.TextXAlignment.Left
-        neonLbl.Parent = subPanel
+    end
+})
+
+CreateHeader(TabVisuals, "TRACERS & LINES")
+CreateSection(TabVisuals, Config.Tracers.Innocent, "Tracer Innocent")
+CreateSection(TabVisuals, Config.Tracers.Sheriff, "Tracer Sheriff")
+CreateSection(TabVisuals, Config.Tracers.Murder, "Tracer Murder")
+
+CreateHeader(TabVisuals, "CLEAN BOXES")
+CreateSection(TabVisuals, Config.Boxes.Innocent, "Box Innocent")
+CreateSection(TabVisuals, Config.Boxes.Sheriff, "Box Sheriff")
+CreateSection(TabVisuals, Config.Boxes.Murder, "Box Murder")
+
+-- Populate Visual Effects Tab
+CreateHeader(TabFX, "PLAYER AURA")
+CreateSection(TabFX, Config.Aura, "Player Aura Effect")
+
+CreateHeader(TabFX, "ANGEL WINGS")
+CreateSection(TabFX, Config.Angel, "Angel Wings Effect")
+
+-- Populate Movement Tab
+CreateHeader(TabMove, "MOVEMENT MODES")
+CreateSection(TabMove, Config.Movement.Fly, "Fly (Полет)", {
+    Color = false,
+    Transparency = false,
+    CustomSub = function(panel, y)
+        local animLbl = Instance.new("TextLabel")
+        animLbl.Size = UDim2.new(0.7, 0, 0, 22)
+        animLbl.Position = UDim2.new(0, 0, 0, y)
+        animLbl.BackgroundTransparency = 1
+        animLbl.Text = "Batman Fly Animation"
+        animLbl.Font = Enum.Font.GothamMedium
+        animLbl.TextSize = 12
+        animLbl.TextColor3 = Color3.fromRGB(200, 200, 200)
+        animLbl.TextXAlignment = Enum.TextXAlignment.Left
+        animLbl.Parent = panel
         
-        local neonBtn = Instance.new("TextButton")
-        neonBtn.Size = UDim2.new(0, 36, 0, 18)
-        neonBtn.Position = UDim2.new(1, -36, 0, 110)
-        neonBtn.BackgroundColor3 = cfgRef.Neon and Color3.fromRGB(255, 30, 60) or Color3.fromRGB(40, 40, 50)
-        neonBtn.Text = ""
-        neonBtn.Parent = subPanel
+        local animBtn = Instance.new("TextButton")
+        animBtn.Size = UDim2.new(0, 36, 0, 18)
+        animBtn.Position = UDim2.new(1, -36, 0, y + 2)
+        animBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+        animBtn.Text = ""
+        animBtn.Parent = panel
         
-        local nCorner = Instance.new("UICorner")
-        nCorner.CornerRadius = UDim.new(1, 0)
-        nCorner.Parent = neonBtn
+        local ac = Instance.new("UICorner") ac.CornerRadius = UDim.new(1, 0) ac.Parent = animBtn
+        local ad = Instance.new("Frame") ad.Size = UDim2.new(0, 12, 0, 12) ad.Position = UDim2.new(0, 3, 0.5, -6) ad.BackgroundColor3 = Color3.fromRGB(150, 150, 150) ad.Parent = animBtn
+        local adc = Instance.new("UICorner") adc.CornerRadius = UDim.new(1, 0) adc.Parent = ad
         
-        local nDot = Instance.new("Frame")
-        nDot.Size = UDim2.new(0, 12, 0, 12)
-        nDot.Position = cfgRef.Neon and UDim2.new(1, -15, 0.5, -6) or UDim2.new(0, 3, 0.5, -6)
-        nDot.BackgroundColor3 = cfgRef.Neon and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
-        nDot.Parent = neonBtn
-        
-        local ndCorner = Instance.new("UICorner")
-        ndCorner.CornerRadius = UDim.new(1, 0)
-        ndCorner.Parent = nDot
-        
-        neonBtn.MouseButton1Click:Connect(function()
-            cfgRef.Neon = not cfgRef.Neon
-            local st = cfgRef.Neon
-            TweenService:Create(neonBtn, TweenInfo.new(0.2), {BackgroundColor3 = st and Color3.fromRGB(255, 30, 60) or Color3.fromRGB(40, 40, 50)}):Play()
-            TweenService:Create(nDot, TweenInfo.new(0.2), {Position = st and UDim2.new(1, -15, 0.5, -6) or UDim2.new(0, 3, 0.5, -6), BackgroundColor3 = st and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)}):Play()
+        animBtn.MouseButton1Click:Connect(function()
+            Config.Movement.Fly.BatmanAnim = not Config.Movement.Fly.BatmanAnim
+            local st = Config.Movement.Fly.BatmanAnim
+            TweenService:Create(animBtn, TweenInfo.new(0.2), {BackgroundColor3 = st and Color3.fromRGB(255, 30, 60) or Color3.fromRGB(40, 40, 50)}):Play()
+            TweenService:Create(ad, TweenInfo.new(0.2), {Position = st and UDim2.new(1, -15, 0.5, -6) or UDim2.new(0, 3, 0.5, -6), BackgroundColor3 = st and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)}):Play()
         end)
     end
-    
-    toggleBtn.MouseButton1Click:Connect(function()
-        cfgRef.Enabled = not cfgRef.Enabled
-        local active = cfgRef.Enabled
-        TweenService:Create(toggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = active and Color3.fromRGB(255, 30, 60) or Color3.fromRGB(40, 40, 50)}):Play()
-        TweenService:Create(togDot, TweenInfo.new(0.2), {Position = active and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8), BackgroundColor3 = active and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)}):Play()
-    end)
-    
-    local expanded = false
-    expandBtn.MouseButton1Click:Connect(function()
-        expanded = not expanded
-        expandBtn.Text = expanded and "▲" or "▼"
-        secStroke.Color = expanded and Color3.fromRGB(255, 30, 60) or Color3.fromRGB(45, 45, 55)
-        local targetHeight = expanded and ((isGun or isAura) and 195 or 160) or 38
-        TweenService:Create(sectionFrame, TweenInfo.new(0.25), {Size = UDim2.new(1, -8, 0, targetHeight)}):Play()
-    end)
-end
+})
 
--- Category Headers
-local function CreateHeader(text)
-    local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(1, 0, 0, 20)
-    lbl.BackgroundTransparency = 1
-    lbl.Text = "--- " .. text .. " ---"
-    lbl.Font = Enum.Font.GothamBold
-    lbl.TextSize = 12
-    lbl.TextColor3 = Color3.fromRGB(255, 30, 60)
-    lbl.Parent = TabContent
-end
-
-CreateHeader("OUTLINES")
-CreateSubSection(Config.Outlines.Innocent, "Outline Innocent", false, false)
-CreateSubSection(Config.Outlines.Sheriff, "ESP Sheriff", false, false)
-CreateSubSection(Config.Outlines.Murder, "ESP Murder", false, false)
-CreateSubSection(Config.Outlines.Gun, "ESP Gun", true, false)
-
-CreateHeader("TRACERS")
-CreateSubSection(Config.Tracers.Innocent, "Tracer Innocent", false, false)
-CreateSubSection(Config.Tracers.Sheriff, "Tracer Sheriff", false, false)
-CreateSubSection(Config.Tracers.Murder, "Tracer Murder", false, false)
-
-CreateHeader("BOXES")
-CreateSubSection(Config.Boxes.Innocent, "Box Innocent", false, false)
-CreateSubSection(Config.Boxes.Sheriff, "Box Sheriff", false, false)
-CreateSubSection(Config.Boxes.Murder, "Box Murder", false, false)
-
-CreateHeader("EFFECTS")
-CreateSubSection(Config.Aura, "Player Aura Effect", false, true)
+CreateSection(TabMove, Config.Movement.Spin, "Spin (Вращение)", {Color = false, Transparency = false})
+CreateSection(TabMove, Config.Movement.Noclip, "Noclip (Сквозь стены)", {Color = false, Transparency = false})
 
 -- ==========================================
--- LOGIC & ANIMATED 6-BAR AURA
+-- LOGIC & OPTIMIZED RENDER LOOPS
 -- ==========================================
 local function GetPlayerRole(plr)
     if not plr or not plr.Character then return "Innocent" end
     local backpack = plr:FindFirstChild("Backpack")
     local char = plr.Character
-    
     local hasKnife = (backpack and backpack:FindFirstChild("Knife")) or (char and char:FindFirstChild("Knife"))
-    local hasGun = (backpack and (backpack:FindFirstChild("Gun") or backpack:FindFirstChild("Revolver"))) or 
-                   (char and (char:FindFirstChild("Gun") or char:FindFirstChild("Revolver")))
-                   
+    local hasGun = (backpack and (backpack:FindFirstChild("Gun") or backpack:FindFirstChild("Revolver"))) or (char and (char:FindFirstChild("Gun") or char:FindFirstChild("Revolver")))
     if hasKnife then return "Murder" end
     if hasGun then return "Sheriff" end
     return "Innocent"
 end
 
 local function GetDroppedGun()
-    for _, obj in pairs(workspace:GetChildren()) do
-        if obj.Name == "GunDrop" or (obj:IsA("Tool") and obj.Name == "Gun") then
-            return obj
-        end
+    for _, obj in pairs(Workspace:GetChildren()) do
+        if obj.Name == "GunDrop" or (obj:IsA("Tool") and obj.Name == "Gun") then return obj end
     end
     return nil
 end
@@ -687,83 +739,113 @@ end
 local auraBars = {}
 for i = 1, 6 do
     local bar = Instance.new("Part")
-    bar.Name = "AuraBar_" .. i
     bar.Size = Vector3.new(0.3, 2.2, 0.3)
     bar.CanCollide = false
-    bar.CanQuery = false
-    bar.CanTouch = false
     bar.Anchored = true
     bar.Material = Enum.Material.Neon
     bar.Transparency = 1
-    bar.Parent = AuraContainer
+    bar.Parent = FXContainer
     table.insert(auraBars, bar)
+end
+
+-- Create 3D Angel Wings Parts
+local wingParts = {}
+for i = 1, 10 do
+    local p = Instance.new("Part")
+    p.Size = Vector3.new(0.4, 1.8, 0.3)
+    p.CanCollide = false
+    p.Anchored = true
+    p.Material = Enum.Material.Neon
+    p.Transparency = 1
+    p.Parent = FXContainer
+    table.insert(wingParts, p)
 end
 
 local auraAngle = 0
 
--- RenderStepped Loop for Smooth Visuals
-RunService.RenderStepped:Connect(function()
-    -- 1. Animated Aura
+-- RenderStepped / Movement / Effects Loop
+RunService.RenderStepped:Connect(function(dt)
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    local hum = char and char:FindFirstChild("Humanoid")
+    
+    -- 1. Aura Animation
     local cfgA = Config.Aura
-    if cfgA.Enabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        local hrp = LocalPlayer.Character.HumanoidRootPart
+    if cfgA.Enabled and hrp then
         auraAngle = auraAngle + 0.04
-        
         for i, bar in ipairs(auraBars) do
             local offsetAngle = auraAngle + (i * (math.pi / 3))
-            local radius = 3.5
-            
-            local x = math.cos(offsetAngle) * radius
-            local z = math.sin(offsetAngle) * radius
+            local x = math.cos(offsetAngle) * 3.5
+            local z = math.sin(offsetAngle) * 3.5
             local y = math.sin(offsetAngle * 2) * 1.2
-            
             bar.CFrame = CFrame.new(hrp.Position + Vector3.new(x, y, z)) * CFrame.Angles(offsetAngle, offsetAngle * 0.5, 0)
             bar.Color = cfgA.Color
             bar.Transparency = 1 - cfgA.Transparency
-            bar.Material = cfgA.Neon and Enum.Material.Neon or Enum.Material.SmoothPlastic
         end
     else
-        for _, bar in ipairs(auraBars) do
-            bar.Transparency = 1
+        for _, bar in ipairs(auraBars) do bar.Transparency = 1 end
+    end
+    
+    -- 2. Angel Wings Animation
+    local cfgW = Config.Angel
+    if cfgW.Enabled and hrp then
+        for i, p in ipairs(wingParts) do
+            local side = i <= 5 and -1 or 1
+            local idx = (i - 1) % 5 + 1
+            local wingPos = hrp.CFrame * CFrame.new(side * (1 + idx * 0.5), 0.5 + (idx * 0.3), 1) * CFrame.Angles(0, 0, side * math.rad(15 * idx))
+            p.CFrame = wingPos
+            p.Color = cfgW.Color
+            p.Transparency = 1 - cfgW.Transparency
+        end
+    else
+        for _, p in ipairs(wingParts) do p.Transparency = 1 end
+    end
+    
+    -- 3. Spin Logic
+    if Config.Movement.Spin.Enabled and hrp then
+        hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(Config.Movement.Spin.Speed), 0)
+    end
+    
+    -- 4. Noclip Logic
+    if Config.Movement.Noclip.Enabled and char then
+        for _, v in pairs(char:GetDescendants()) do
+            if v:IsA("BasePart") then v.CanCollide = false end
         end
     end
-
-    -- 2. Tracers & Boxes Canvas Render
+    
+    -- 5. Clean Tracers & Boxes Rendering
     DrawingCanvas:ClearAllChildren()
     for _, plr in pairs(Players:GetPlayers()) do
         if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
             local role = GetPlayerRole(plr)
-            local hrp = plr.Character.HumanoidRootPart
-            local head = plr.Character:FindFirstChild("Head") or hrp
-            local pos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
+            local p_hrp = plr.Character.HumanoidRootPart
+            local p_head = plr.Character:FindFirstChild("Head") or p_hrp
+            local pos, onScreen = Camera:WorldToViewportPoint(p_hrp.Position)
             
             if onScreen then
-                -- Tracers
+                -- Tracers (Clean Lines)
                 local cfgT = Config.Tracers[role]
                 if cfgT and cfgT.Enabled and cfgT.Transparency > 0 then
                     local line = Instance.new("Frame")
                     line.BorderSizePixel = 0
                     line.BackgroundColor3 = cfgT.Color
                     line.BackgroundTransparency = 1 - cfgT.Transparency
-                    
                     local startPos = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)
                     local endPos = Vector2.new(pos.X, pos.Y)
                     local distance = (endPos - startPos).Magnitude
                     local angle = math.atan2(endPos.Y - startPos.Y, endPos.X - startPos.X)
-                    
-                    line.Size = UDim2.new(0, distance, 0, 1.5)
+                    line.Size = UDim2.new(0, distance, 0, 1.2)
                     line.Position = UDim2.new(0, startPos.X, 0, startPos.Y)
                     line.Rotation = math.deg(angle)
                     line.AnchorPoint = Vector2.new(0, 0.5)
                     line.Parent = DrawingCanvas
                 end
                 
-                -- Boxes
+                -- Clean Boxes (Lines instead of solid blocks)
                 local cfgB = Config.Boxes[role]
                 if cfgB and cfgB.Enabled and cfgB.Transparency > 0 then
-                    local headPos = Camera:WorldToViewportPoint(head.Position + Vector3.new(0, 0.8, 0))
-                    local legPos = Camera:WorldToViewportPoint(hrp.Position - Vector3.new(0, 3, 0))
-                    
+                    local headPos = Camera:WorldToViewportPoint(p_head.Position + Vector3.new(0, 0.8, 0))
+                    local legPos = Camera:WorldToViewportPoint(p_hrp.Position - Vector3.new(0, 3, 0))
                     local height = math.abs(headPos.Y - legPos.Y)
                     local width = height / 1.6
                     
@@ -776,7 +858,7 @@ RunService.RenderStepped:Connect(function()
                     local stroke = Instance.new("UIStroke")
                     stroke.Color = cfgB.Color
                     stroke.Transparency = 1 - cfgB.Transparency
-                    stroke.Thickness = 1.5
+                    stroke.Thickness = 1.2
                     stroke.Parent = box
                 end
             end
@@ -784,7 +866,7 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Throttle Loop for Player & Gun Outlines (10 times/sec)
+-- Throttle Loop for Outlines & Gun Alerts (10 times/sec)
 local gunWasOnMap = false
 task.spawn(function()
     while task.wait(0.1) do
