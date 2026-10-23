@@ -1,4 +1,4 @@
--- [[ quatrojoke Script | 3D Volumetric Feather Wings Edition ]] --
+-- [[ quatrojoke Script | Smooth Motion 3D Angel Wings Edition ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -154,15 +154,8 @@ IntroFrame.BackgroundTransparency = 0.05
 IntroFrame.ClipsDescendants = true
 IntroFrame.Parent = ScreenGui
 
-local IntroCorner = Instance.new("UICorner")
-IntroCorner.CornerRadius = UDim.new(0, 10)
-IntroCorner.Parent = IntroFrame
-
-local IntroStroke = Instance.new("UIStroke")
-IntroStroke.Color = Color3.fromRGB(255, 30, 60)
-IntroStroke.Thickness = 2
-IntroStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-IntroStroke.Parent = IntroFrame
+local IntroCorner = Instance.new("UICorner") IntroCorner.CornerRadius = UDim.new(0, 10) IntroCorner.Parent = IntroFrame
+local IntroStroke = Instance.new("UIStroke") IntroStroke.Color = Color3.fromRGB(255, 30, 60) IntroStroke.Thickness = 2 IntroStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border IntroStroke.Parent = IntroFrame
 
 local IntroTitle = Instance.new("TextLabel")
 IntroTitle.Size = UDim2.new(1, 0, 0, 60)
@@ -193,19 +186,9 @@ BarBg.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
 BarBg.BorderSizePixel = 0
 BarBg.Parent = IntroFrame
 
-local BarCorner = Instance.new("UICorner")
-BarCorner.CornerRadius = UDim.new(1, 0)
-BarCorner.Parent = BarBg
-
-local BarFill = Instance.new("Frame")
-BarFill.Size = UDim2.new(0, 0, 1, 0)
-BarFill.BackgroundColor3 = Color3.fromRGB(255, 30, 60)
-BarFill.BorderSizePixel = 0
-BarFill.Parent = BarBg
-
-local FillCorner = Instance.new("UICorner")
-FillCorner.CornerRadius = UDim.new(1, 0)
-FillCorner.Parent = BarFill
+local BarCorner = Instance.new("UICorner") BarCorner.CornerRadius = UDim.new(1, 0) BarCorner.Parent = BarBg
+local BarFill = Instance.new("Frame") BarFill.Size = UDim2.new(0, 0, 1, 0) BarFill.BackgroundColor3 = Color3.fromRGB(255, 30, 60) BarFill.BorderSizePixel = 0 BarFill.Parent = BarBg
+local FillCorner = Instance.new("UICorner") FillCorner.CornerRadius = UDim.new(1, 0) FillCorner.Parent = BarFill
 
 local StatusLabel = Instance.new("TextLabel")
 StatusLabel.Size = UDim2.new(1, 0, 0, 25)
@@ -219,7 +202,7 @@ StatusLabel.Parent = IntroFrame
 
 math.randomseed(os.time())
 local loadTime = math.random(4, 14)
-local statuses = {"Построение 3D-крыльев...", "Генерация перьевого каркаса...", "Оптимизация кадров...", "Запуск quatrojoke..."}
+local statuses = {"Плавная настройка физики...", "Сглаживание крыльев...", "Оптимизация...", "Запуск quatrojoke..."}
 
 task.spawn(function()
     local elapsed = 0
@@ -722,7 +705,7 @@ CreateSection(TabMove, Config.Movement.Spin, "Spin (Вращение)", {
 CreateSection(TabMove, Config.Movement.Noclip, "Noclip (Сквозь стены)", {Color = false, Transparency = false, ExpandedHeight = 40})
 
 -- ==========================================
--- 3D VOLUMETRIC FEATHERED WINGS ARCHITECTURE
+-- REALISTIC 3D SMOOTH WINGS ENGINE
 -- ==========================================
 local function GetPlayerRole(plr)
     if not plr or not plr.Character then return "Innocent" end
@@ -755,11 +738,11 @@ for i = 1, 6 do
     table.insert(auraBars, bar)
 end
 
--- Create 44 Volumetric Feathers with Curved Meshes
+-- Create Volumetric Feather Parts
 local wing3DFeathers = {}
-for side = -1, 1, 2 do -- -1 Left, 1 Right
-    for layer = 1, 4 do -- 4 Volumetric Layers (Dense Base to Long Outer Wings)
-        for i = 1, 5 do -- 5 Main feathers per layer
+for side = -1, 1, 2 do
+    for layer = 1, 4 do
+        for i = 1, 5 do
             local feather = Instance.new("Part")
             feather.CanCollide = false
             feather.Anchored = true
@@ -767,13 +750,10 @@ for side = -1, 1, 2 do -- -1 Left, 1 Right
             feather.Transparency = 1
             feather.Parent = FXContainer
             
-            -- Volumetric 3D Wedge Mesh for realistic feather shape
             local mesh = Instance.new("SpecialMesh")
             mesh.MeshType = Enum.MeshType.Wedge
-            
             local len = (layer == 1 and 0.9) or (layer == 2 and 1.6) or (layer == 3 and 2.4) or (3.2 + (i * 0.35))
-            local width = (layer == 1 and 0.4) or (0.35)
-            mesh.Scale = Vector3.new(0.12, len, width)
+            mesh.Scale = Vector3.new(0.12, len, 0.35)
             mesh.Parent = feather
             
             table.insert(wing3DFeathers, {
@@ -787,7 +767,7 @@ for side = -1, 1, 2 do -- -1 Left, 1 Right
 end
 
 -- ==========================================
--- ENGINE LOOP
+-- MAIN ENGINE LOOP
 -- ==========================================
 local auraAngle = 0
 local wingFlap = 0
@@ -842,12 +822,12 @@ RunService.RenderStepped:Connect(function()
         for _, bar in ipairs(auraBars) do bar.Transparency = 1 end
     end
     
-    -- 3. Realistic Volumetric Curved Wings (Anatomical Arch Motion)
+    -- 3. Smooth Lerped Volumetric Wings (Без дерганий при ходьбе)
     local cfgW = Config.Angel
     if cfgW.Enabled and hrp then
         local isMoving = (hum and hum.MoveDirection.Magnitude > 0) or Config.Movement.Fly.Enabled
-        wingFlap = wingFlap + (isMoving and 0.08 or 0.035)
-        local flapRad = math.sin(wingFlap) * (isMoving and 0.35 or 0.15)
+        wingFlap = wingFlap + (isMoving and 0.05 or 0.025) -- Плавный ритм
+        local flapRad = math.sin(wingFlap) * (isMoving and 0.25 or 0.1)
         
         for _, fData in ipairs(wing3DFeathers) do
             local p = fData.Part
@@ -855,17 +835,18 @@ RunService.RenderStepped:Connect(function()
             local layer = fData.Layer
             local i = fData.Index
             
-            -- Анатомический дугообразный веер крыла[cite: 1]
             local archX = side * (0.5 + (i * 0.42) + (layer * 0.12))
             local archY = 0.6 + (i * 0.38) - (layer * 0.35) + flapRad
             local archZ = 0.6 + (layer * 0.18) + (i * 0.08)
             
-            -- Углы перьев для создания объёма и естественного изгиба[cite: 1]
             local rotX = math.rad(-20 + (i * 6))
-            local rotY = side * (math.rad(35 + i * 10) + (flapRad * 25))
-            local rotZ = side * (math.rad(-45 - i * 8) + (flapRad * 18))
+            local rotY = side * (math.rad(35 + i * 10) + (flapRad * 20))
+            local rotZ = side * (math.rad(-45 - i * 8) + (flapRad * 12))
             
-            p.CFrame = hrp.CFrame * CFrame.new(archX, archY, archZ) * CFrame.Angles(rotX, rotY, rotZ)
+            local targetCF = hrp.CFrame * CFrame.new(archX, archY, archZ) * CFrame.Angles(rotX, rotY, rotZ)
+            
+            -- Плавное сглаживание движения (Lerp)
+            p.CFrame = p.CFrame:Lerp(targetCF, 0.25)
             p.Color = cfgW.Color
             p.Transparency = 1 - cfgW.Transparency
         end
