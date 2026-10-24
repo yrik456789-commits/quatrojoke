@@ -1,4 +1,4 @@
--- [[ quatrojoke Script | Fully Fixed & Optimized Edition ]] --
+-- [[ quatrojoke Script | Ultimate MM2 Suite ]] --
 
 local success, err = pcall(function()
     local Players = game:GetService("Players")
@@ -42,8 +42,8 @@ local success, err = pcall(function()
     -- ==========================================
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
-    MainFrame.Size = UDim2.new(0, 620, 0, 470)
-    MainFrame.Position = UDim2.new(0.5, -310, 0.5, -235)
+    MainFrame.Size = UDim2.new(0, 640, 0, 480)
+    MainFrame.Position = UDim2.new(0.5, -320, 0.5, -240)
     MainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 16)
     MainFrame.BackgroundTransparency = 0.05
     MainFrame.BorderSizePixel = 0
@@ -85,7 +85,7 @@ local success, err = pcall(function()
     -- Notification Toast
     local ToastFrame = Instance.new("Frame")
     ToastFrame.Name = "ToastFrame"
-    ToastFrame.Size = UDim2.new(0, 240, 0, 42)
+    ToastFrame.Size = UDim2.new(0, 260, 0, 42)
     ToastFrame.Position = UDim2.new(1, 20, 1, -55)
     ToastFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
     ToastFrame.BorderSizePixel = 0
@@ -97,14 +97,14 @@ local success, err = pcall(function()
     local ToastText = Instance.new("TextLabel")
     ToastText.Size = UDim2.new(1, 0, 1, 0)
     ToastText.BackgroundTransparency = 1
-    ToastText.Text = "📌 Скрипт скрыт (LeftControl)"
+    ToastText.Text = "📌 Скрипт скрыт (нажми LeftControl)"
     ToastText.Font = Enum.Font.GothamMedium
-    ToastText.TextSize = 12
+    ToastText.TextSize = 11
     ToastText.TextColor3 = Color3.fromRGB(220, 220, 230)
     ToastText.Parent = ToastFrame
 
     local function ShowToast()
-        ToastFrame:TweenPosition(UDim2.new(1, -250, 1, -55), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.4, true)
+        ToastFrame:TweenPosition(UDim2.new(1, -270, 1, -55), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.4, true)
         task.delay(3, function()
             ToastFrame:TweenPosition(UDim2.new(1, 20, 1, -55), Enum.EasingDirection.In, Enum.EasingStyle.Quart, 0.4, true)
         end)
@@ -152,9 +152,21 @@ local success, err = pcall(function()
     local MinCorner = Instance.new("UICorner") MinCorner.CornerRadius = UDim.new(0, 8) MinCorner.Parent = MinimizeBtn
 
     local function ToggleMinimize()
-        MainFrame.Visible = not MainFrame.Visible
-        RainbowWidget.Visible = not MainFrame.Visible
-        if not MainFrame.Visible then ShowToast() end
+        if MainFrame.Visible then
+            TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1}):Play()
+            task.wait(0.3)
+            MainFrame.Visible = false
+            MainFrame.Size = UDim2.new(0, 640, 0, 480)
+            MainFrame.BackgroundTransparency = 0.05
+            RainbowWidget.Visible = true
+            ShowToast()
+        else
+            RainbowWidget.Visible = false
+            MainFrame.Visible = true
+            MainFrame.Size = UDim2.new(0, 0, 0, 0)
+            MainFrame.BackgroundTransparency = 1
+            TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(0, 640, 0, 480), BackgroundTransparency = 0.05}):Play()
+        end
     end
 
     MinimizeBtn.MouseButton1Click:Connect(ToggleMinimize)
@@ -207,8 +219,8 @@ local success, err = pcall(function()
     -- ==========================================
     local IntroFrame = Instance.new("Frame")
     IntroFrame.Name = "IntroFrame"
-    IntroFrame.Size = UDim2.new(0, 620, 0, 470)
-    IntroFrame.Position = UDim2.new(0.5, -310, 0.5, -235)
+    IntroFrame.Size = UDim2.new(0, 640, 0, 480)
+    IntroFrame.Position = UDim2.new(0.5, -320, 0.5, -240)
     IntroFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 14)
     IntroFrame.BackgroundTransparency = 0.05
     IntroFrame.ClipsDescendants = true
@@ -261,8 +273,8 @@ local success, err = pcall(function()
     StatusLabel.Parent = IntroFrame
 
     math.randomseed(os.time())
-    local loadTime = math.random(3, 7)
-    local statuses = {"Подготовка графики...", "Восстановление FX...", "Синхронизация...", "Запуск quatrojoke..."}
+    local loadTime = math.random(3, 6)
+    local statuses = {"Загрузка модулей...", "Калибровка 3D боксов...", "Инициализация Nicks...", "Запуск quatrojoke..."}
 
     task.spawn(function()
         local elapsed = 0
@@ -308,10 +320,15 @@ local success, err = pcall(function()
             Sheriff  = { Enabled = false, Color = Color3.fromRGB(0, 140, 255), Transparency = 1 },
             Murder   = { Enabled = false, Color = Color3.fromRGB(255, 40, 70), Transparency = 1 }
         },
-        Boxes = {
+        Boxes3D = {
             Innocent = { Enabled = false, Color = Color3.fromRGB(0, 255, 120), Transparency = 1 },
             Sheriff  = { Enabled = false, Color = Color3.fromRGB(0, 140, 255), Transparency = 1 },
             Murder   = { Enabled = false, Color = Color3.fromRGB(255, 40, 70), Transparency = 1 }
+        },
+        Nicks = {
+            Innocent = { Enabled = false, Color = Color3.fromRGB(0, 255, 120) },
+            Sheriff  = { Enabled = false, Color = Color3.fromRGB(0, 140, 255) },
+            Murder   = { Enabled = false, Color = Color3.fromRGB(255, 40, 70) }
         },
         Aura = { Enabled = false, Color = Color3.fromRGB(255, 40, 70), Transparency = 0.8 },
         Angel = { Enabled = false, Color = Color3.fromRGB(255, 255, 255), Transparency = 0.8 },
@@ -321,7 +338,6 @@ local success, err = pcall(function()
             Kill = { Enabled = false, SoundId = "rbxassetid://4590657391" },
             MurderKill = { Enabled = false, SoundId = "rbxassetid://6026985010" }
         },
-        Fling = { SelfEnabled = false },
         AntiFling = { Enabled = false },
         Movement = {
             Fly = { Enabled = false, Speed = 50, BatmanAnim = false },
@@ -329,6 +345,8 @@ local success, err = pcall(function()
             Noclip = { Enabled = false }
         }
     }
+
+    local SelectedFlingTarget = nil
 
     -- ==========================================
     -- TABS & UI BUILDER
@@ -386,6 +404,7 @@ local success, err = pcall(function()
     local TabVisuals = CreateTab("Visuals / ESP")
     local TabSounds = CreateTab("Sounds")
     local TabFling = CreateTab("Fling")
+    local TabMisc = CreateTab("Misc")
     local TabFX = CreateTab("Visual Effects")
     local TabMove = CreateTab("Movement")
 
@@ -582,10 +601,15 @@ local success, err = pcall(function()
     CreateSection(TabVisuals, Config.Tracers.Sheriff, "Tracer Sheriff")
     CreateSection(TabVisuals, Config.Tracers.Murder, "Tracer Murder")
 
-    CreateHeader(TabVisuals, "3D BOX ESP")
-    CreateSection(TabVisuals, Config.Boxes.Innocent, "3D Box Innocent")
-    CreateSection(TabVisuals, Config.Boxes.Sheriff, "3D Box Sheriff")
-    CreateSection(TabVisuals, Config.Boxes.Murder, "3D Box Murder")
+    CreateHeader(TabVisuals, "TRUE 3D BOXES")
+    CreateSection(TabVisuals, Config.Boxes3D.Innocent, "3D Box Innocent")
+    CreateSection(TabVisuals, Config.Boxes3D.Sheriff, "3D Box Sheriff")
+    CreateSection(TabVisuals, Config.Boxes3D.Murder, "3D Box Murder")
+
+    CreateHeader(TabVisuals, "NICKS PEOPLES")
+    CreateSection(TabVisuals, Config.Nicks.Innocent, "Nick Innocent", {Transparency = false, ExpandedHeight = 90})
+    CreateSection(TabVisuals, Config.Nicks.Sheriff, "Nick Sheriff", {Transparency = false, ExpandedHeight = 90})
+    CreateSection(TabVisuals, Config.Nicks.Murder, "Nick Murder", {Transparency = false, ExpandedHeight = 90})
 
     -- Sounds Tab
     CreateHeader(TabSounds, "SOUNDS")
@@ -594,17 +618,94 @@ local success, err = pcall(function()
     CreateSection(TabSounds, Config.Sounds.MurderKill, "Kill Sound (Murder)", {Color = false, Transparency = false, ExpandedHeight = 40})
 
     -- Fling Tab
-    CreateHeader(TabFling, "SELF FLING MODE")
-    CreateSection(TabFling, Config.Fling, "Self Fling (Рванина собою)", {Color = false, Transparency = false, ExpandedHeight = 40})
+    CreateHeader(TabFling, "PLAYER SELECTOR FLING")
+
+    local PlayerListFrame = Instance.new("ScrollingFrame")
+    PlayerListFrame.Size = UDim2.new(1, -8, 0, 160)
+    PlayerListFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+    PlayerListFrame.ScrollBarThickness = 4
+    PlayerListFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 40, 70)
+    PlayerListFrame.Parent = TabFling
+
+    local pListCorner = Instance.new("UICorner") pListCorner.CornerRadius = UDim.new(0, 8) pListCorner.Parent = PlayerListFrame
+    local pListLayout = Instance.new("UIListLayout") pListLayout.Padding = UDim.new(0, 4) pListLayout.Parent = PlayerListFrame
+
+    local function RefreshPlayerList()
+        PlayerListFrame:ClearAllChildren()
+        local layout = Instance.new("UIListLayout") layout.Padding = UDim.new(0, 4) layout.Parent = PlayerListFrame
+        
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= LocalPlayer then
+                local pBtn = Instance.new("TextButton")
+                pBtn.Size = UDim2.new(1, -8, 0, 28)
+                pBtn.BackgroundColor3 = (SelectedFlingTarget == plr) and Color3.fromRGB(50, 20, 35) or Color3.fromRGB(25, 25, 35)
+                pBtn.Text = "  " .. plr.DisplayName .. " (@" .. plr.Name .. ")"
+                pBtn.Font = Enum.Font.GothamMedium
+                pBtn.TextSize = 12
+                pBtn.TextColor3 = Color3.fromRGB(220, 220, 230)
+                pBtn.TextXAlignment = Enum.TextXAlignment.Left
+                pBtn.Parent = PlayerListFrame
+                
+                local c = Instance.new("UICorner") c.CornerRadius = UDim.new(0, 6) c.Parent = pBtn
+                pBtn.MouseButton1Click:Connect(function()
+                    SelectedFlingTarget = plr
+                    RefreshPlayerList()
+                end)
+            end
+        end
+        PlayerListFrame.CanvasSize = UDim2.new(0, 0, 0, #Players:GetPlayers() * 32)
+    end
+
+    RefreshPlayerList()
+    Players.PlayerAdded:Connect(RefreshPlayerList)
+    Players.PlayerRemoving:Connect(RefreshPlayerList)
+
+    local FlingActionBtn = Instance.new("TextButton")
+    FlingActionBtn.Size = UDim2.new(1, -8, 0, 36)
+    FlingActionBtn.BackgroundColor3 = Color3.fromRGB(255, 40, 70)
+    FlingActionBtn.Text = "⚡ ЗАПУСТИТЬ FLING НА ЦЕЛЬ"
+    FlingActionBtn.Font = Enum.Font.GothamBold
+    FlingActionBtn.TextSize = 13
+    FlingActionBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    FlingActionBtn.Parent = TabFling
+
+    local faCorner = Instance.new("UICorner") faCorner.CornerRadius = UDim.new(0, 8) faCorner.Parent = FlingActionBtn
+
+    FlingActionBtn.MouseButton1Click:Connect(function()
+        if SelectedFlingTarget and SelectedFlingTarget.Character and SelectedFlingTarget.Character:FindFirstChild("HumanoidRootPart") then
+            local targetHrp = SelectedFlingTarget.Character.HumanoidRootPart
+            local myChar = LocalPlayer.Character
+            local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+            
+            if myHrp then
+                task.spawn(function()
+                    local bV = Instance.new("BodyAngularVelocity")
+                    bV.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
+                    bV.AngularVelocity = Vector3.new(99999, 99999, 99999)
+                    bV.Parent = myHrp
+                    
+                    for i = 1, 45 do
+                        if not targetHrp or not targetHrp.Parent then break end
+                        myHrp.CFrame = targetHrp.CFrame
+                        task.wait(0.02)
+                    end
+                    bV:Destroy()
+                end)
+            end
+        end
+    end)
 
     CreateHeader(TabFling, "PROTECTION")
     CreateSection(TabFling, Config.AntiFling, "Anti Fling (Защита)", {Color = false, Transparency = false, ExpandedHeight = 40})
+
+    -- Misc Tab
+    CreateHeader(TabMisc, "ENHANCED FEATURES")
+    CreateSection(TabMisc, Config.DemonArms, "Demon Arms (Плавные клешни)", {ExpandedHeight = 170})
 
     -- Visual FX Tab
     CreateHeader(TabFX, "EFFECTS")
     CreateSection(TabFX, Config.Aura, "Player Aura Effect")
     CreateSection(TabFX, Config.Angel, "3D Angel Wings")
-    CreateSection(TabFX, Config.DemonArms, "Demon Arms (Вторые руки)")
 
     -- Movement Tab
     CreateHeader(TabMove, "MOVEMENT")
@@ -615,8 +716,6 @@ local success, err = pcall(function()
     -- ==========================================
     -- VISUAL FX GENERATORS (Wings, Aura, Demon Arms)
     -- ==========================================
-    
-    -- 1. Spiral Aura
     local auraBars = {}
     for i = 1, 6 do
         local bar = Instance.new("Part")
@@ -625,7 +724,6 @@ local success, err = pcall(function()
         table.insert(auraBars, bar)
     end
 
-    -- 2. 3D Angel Wings
     local wing3DFeathers = {}
     for side = -1, 1, 2 do
         for layer = 1, 3 do
@@ -643,15 +741,15 @@ local success, err = pcall(function()
         end
     end
 
-    -- 3. Volumetric Demon Arms (Solid Lego Claws)
+    -- Super smooth and high quality Demon Arms (Lego Claws)
     local demonArmsParts = {}
     for side = -1, 1, 2 do
         local armUpper = Instance.new("Part")
-        armUpper.Size = Vector3.new(0.45, 1.6, 0.45)
+        armUpper.Size = Vector3.new(0.4, 1.7, 0.4)
         armUpper.CanCollide = false armUpper.Anchored = true armUpper.Material = Enum.Material.SmoothPlastic armUpper.Transparency = 1 armUpper.Parent = FXContainer
         
         local clawLeft = Instance.new("Part")
-        clawLeft.Size = Vector3.new(0.2, 0.8, 0.3)
+        clawLeft.Size = Vector3.new(0.18, 0.7, 0.25)
         clawLeft.CanCollide = false clawLeft.Anchored = true clawLeft.Material = Enum.Material.SmoothPlastic clawLeft.Transparency = 1 clawLeft.Parent = FXContainer
         
         local clawRight = clawLeft:Clone() clawRight.Parent = FXContainer
@@ -659,7 +757,6 @@ local success, err = pcall(function()
         table.insert(demonArmsParts, {Upper = armUpper, ClawL = clawLeft, ClawR = clawRight, Side = side})
     end
 
-    -- Helper Role Finder
     local function GetPlayerRole(plr)
         if not plr or not plr.Character then return "Innocent" end
         local backpack = plr:FindFirstChild("Backpack")
@@ -672,7 +769,7 @@ local success, err = pcall(function()
     end
 
     -- ==========================================
-    -- ENGINE RENDER LOOP (Optimized & Clean)
+    -- ENGINE RENDER LOOP (True 3D Boxes & Nicks)
     -- ==========================================
     local auraAngle = 0
     local wingFlap = 0
@@ -681,29 +778,18 @@ local success, err = pcall(function()
 
     local bodyVel = Instance.new("BodyVelocity") bodyVel.MaxForce = Vector3.new(0, 0, 0)
     local bodyGyro = Instance.new("BodyGyro") bodyGyro.MaxTorque = Vector3.new(0, 0, 0)
-    local flingVel = Instance.new("BodyAngularVelocity") flingVel.MaxTorque = Vector3.new(0, 0, 0)
 
     RunService.RenderStepped:Connect(function()
         local char = LocalPlayer.Character
         local hrp = char and char:FindFirstChild("HumanoidRootPart")
         local hum = char and char:FindFirstChild("Humanoid")
 
-        -- Rainbow Color-Shifting Minimized Widget
         if RainbowWidget.Visible then
             hue = (hue + 0.005) % 1
             WidgetStroke.Color = Color3.fromHSV(hue, 0.8, 1)
         end
 
-        -- Self-Fling Engine
-        if Config.Fling.Enabled and hrp then
-            flingVel.Parent = hrp
-            flingVel.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
-            flingVel.AngularVelocity = Vector3.new(9999, 9999, 9999)
-        else
-            flingVel.MaxTorque = Vector3.new(0, 0, 0)
-        end
-
-        -- Anti-Fling Engine
+        -- Anti-Fling
         if Config.AntiFling.Enabled and hrp then
             for _, v in pairs(Workspace:GetChildren()) do
                 if v:IsA("Model") and v ~= char and v:FindFirstChild("HumanoidRootPart") then
@@ -719,7 +805,7 @@ local success, err = pcall(function()
             end
         end
 
-        -- Spiral Aura FX
+        -- Spiral Aura
         local cfgA = Config.Aura
         if cfgA.Enabled and hrp then
             auraAngle = auraAngle + 0.05
@@ -737,7 +823,7 @@ local success, err = pcall(function()
             for _, bar in ipairs(auraBars) do bar.Transparency = 1 end
         end
 
-        -- 3D Angel Wings FX
+        -- Angel Wings
         local cfgW = Config.Angel
         if cfgW.Enabled and hrp then
             local isMoving = (hum and hum.MoveDirection.Magnitude > 0) or Config.Movement.Fly.Enabled
@@ -767,21 +853,21 @@ local success, err = pcall(function()
             for _, fData in ipairs(wing3DFeathers) do fData.Part.Transparency = 1 end
         end
 
-        -- Demon Arms FX (Volumetric Lego Claws)[cite: 3]
+        -- Ultra Smooth Demon Arms
         local cfgDA = Config.DemonArms
         if cfgDA.Enabled and hrp then
-            armBob = armBob + 0.04
-            local bobY = math.sin(armBob) * 0.18
+            armBob = armBob + 0.05
+            local bobY = math.sin(armBob) * 0.15
             
             for _, arm in ipairs(demonArmsParts) do
                 local side = arm.Side
-                local targetUpperCF = hrp.CFrame * CFrame.new(side * 1.6, 0.5 + bobY, 0.7) * CFrame.Angles(math.rad(25), 0, side * math.rad(-25))
-                local targetClawLCF = targetUpperCF * CFrame.new(-0.25, 0.9, -0.3) * CFrame.Angles(math.rad(40), math.rad(-20), 0)
-                local targetClawRCF = targetUpperCF * CFrame.new(0.25, 0.9, -0.3) * CFrame.Angles(math.rad(40), math.rad(20), 0)
+                local targetUpperCF = hrp.CFrame * CFrame.new(side * 1.5, 0.4 + bobY, 0.6) * CFrame.Angles(math.rad(15), 0, side * math.rad(-20))
+                local targetClawLCF = targetUpperCF * CFrame.new(-0.2, 0.8, -0.25) * CFrame.Angles(math.rad(35), math.rad(-15), 0)
+                local targetClawRCF = targetUpperCF * CFrame.new(0.2, 0.8, -0.25) * CFrame.Angles(math.rad(35), math.rad(15), 0)
                 
-                arm.Upper.CFrame = arm.Upper.CFrame:Lerp(targetUpperCF, 0.25)
-                arm.ClawL.CFrame = arm.ClawL.CFrame:Lerp(targetClawLCF, 0.25)
-                arm.ClawR.CFrame = arm.ClawR.CFrame:Lerp(targetClawRCF, 0.25)
+                arm.Upper.CFrame = arm.Upper.CFrame:Lerp(targetUpperCF, 0.3)
+                arm.ClawL.CFrame = arm.ClawL.CFrame:Lerp(targetClawLCF, 0.3)
+                arm.ClawR.CFrame = arm.ClawR.CFrame:Lerp(targetClawRCF, 0.3)
                 
                 arm.Upper.Color = cfgDA.Color
                 arm.ClawL.Color = cfgDA.Color
@@ -798,12 +884,13 @@ local success, err = pcall(function()
             end
         end
 
-        -- ESP Rendering (Tracers & 3D Boxes)
+        -- ESP Rendering (True 3D Corners & Nicks Peoples)
         DrawingCanvas:ClearAllChildren()
         for _, plr in pairs(Players:GetPlayers()) do
             if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
                 local role = GetPlayerRole(plr)
                 local p_hrp = plr.Character.HumanoidRootPart
+                local head = plr.Character:FindFirstChild("Head")
                 local pos, onScreen = Camera:WorldToScreenPoint(p_hrp.Position)
                 
                 if onScreen then
@@ -825,26 +912,54 @@ local success, err = pcall(function()
                         line.Parent = DrawingCanvas
                     end
                     
-                    -- 3D Box ESP
-                    local cfgB = Config.Boxes[role]
+                    -- True 3D Box ESP (Volumetric Corner Frame)
+                    local cfgB = Config.Boxes3D[role]
                     if cfgB and cfgB.Enabled and cfgB.Transparency > 0 then
                         local cSize = plr.Character:GetExtentsSize()
                         local topCF = Camera:WorldToScreenPoint(p_hrp.Position + Vector3.new(0, cSize.Y / 2, 0))
                         local botCF = Camera:WorldToScreenPoint(p_hrp.Position - Vector3.new(0, cSize.Y / 2, 0))
                         local height = math.abs(topCF.Y - botCF.Y)
-                        local width = height / 1.5
+                        local width = height / 1.6
                         
-                        local box = Instance.new("Frame")
-                        box.Size = UDim2.new(0, width, 0, height)
-                        box.Position = UDim2.new(0, pos.X - width / 2, 0, pos.Y - height / 2)
-                        box.BackgroundTransparency = 1
-                        box.Parent = DrawingCanvas
+                        local bX, bY = pos.X - width / 2, pos.Y - height / 2
+                        local col3D = cfgB.Color
+                        local trans3D = 1 - cfgB.Transparency
                         
-                        local stroke = Instance.new("UIStroke")
-                        stroke.Color = cfgB.Color
-                        stroke.Transparency = 1 - cfgB.Transparency
-                        stroke.Thickness = 1.5
-                        stroke.Parent = box
+                        -- Render 4 Corner Lines for 3D effect
+                        for _, cornerData in ipairs({
+                            {UDim2.new(0, bX, 0, bY), UDim2.new(0, width * 0.25, 0, 1.5)}, -- Top-Left H
+                            {UDim2.new(0, bX, 0, bY), UDim2.new(0, 1.5, 0, height * 0.25)}, -- Top-Left V
+                            {UDim2.new(0, bX + width * 0.75, 0, bY), UDim2.new(0, width * 0.25, 0, 1.5)}, -- Top-Right H
+                            {UDim2.new(0, bX + width, 0, bY), UDim2.new(0, 1.5, 0, height * 0.25)}, -- Top-Right V
+                            {UDim2.new(0, bX, 0, bY + height), UDim2.new(0, width * 0.25, 0, 1.5)}, -- Bot-Left H
+                            {UDim2.new(0, bX, 0, bY + height * 0.75), UDim2.new(0, 1.5, 0, height * 0.25)}, -- Bot-Left V
+                            {UDim2.new(0, bX + width * 0.75, 0, bY + height), UDim2.new(0, width * 0.25, 0, 1.5)}, -- Bot-Right H
+                            {UDim2.new(0, bX + width, 0, bY + height * 0.75), UDim2.new(0, 1.5, 0, height * 0.25)} -- Bot-Right V
+                        }) do
+                            local ln = Instance.new("Frame")
+                            ln.BackgroundColor3 = col3D
+                            ln.BackgroundTransparency = trans3D
+                            ln.BorderSizePixel = 0
+                            ln.Position = cornerData[1]
+                            ln.Size = cornerData[2]
+                            ln.Parent = DrawingCanvas
+                        end
+                    end
+
+                    -- Nicks Peoples feature
+                    local cfgN = Config.Nicks[role]
+                    if cfgN and cfgN.Enabled and head then
+                        local headPos = Camera:WorldToScreenPoint(head.Position + Vector3.new(0, 0.8, 0))
+                        local nickLbl = Instance.new("TextLabel")
+                        nickLbl.Size = UDim2.new(0, 150, 0, 20)
+                        nickLbl.Position = UDim2.new(0, headPos.X - 75, 0, headPos.Y - 10)
+                        nickLbl.BackgroundTransparency = 1
+                        nickLbl.Text = plr.Name .. " [" .. role .. "]"
+                        nickLbl.Font = Enum.Font.GothamBold
+                        nickLbl.TextSize = 12
+                        nickLbl.TextColor3 = cfgN.Color
+                        nickLbl.TextStrokeTransparency = 0.3
+                        nickLbl.Parent = DrawingCanvas
                     end
                 end
             end
