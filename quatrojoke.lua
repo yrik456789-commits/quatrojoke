@@ -1,4 +1,4 @@
--- [[ quatrojoke Script | Safe-Inject Edition ]] --
+-- [[ quatrojoke Script | Fully Fixed & Optimized Edition ]] --
 
 local success, err = pcall(function()
     local Players = game:GetService("Players")
@@ -17,7 +17,7 @@ local success, err = pcall(function()
     if Workspace:FindFirstChild("QuatroFXContainer") then Workspace:FindFirstChild("QuatroFXContainer"):Destroy() end
 
     -- ==========================================
-    -- SCREEN GUI & CONTAINERS
+    -- CONTAINERS & SCREEN GUI
     -- ==========================================
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "QuatrojokeUI"
@@ -38,7 +38,7 @@ local success, err = pcall(function()
     FXContainer.Parent = Workspace
 
     -- ==========================================
-    -- MAIN FRAME
+    -- MAIN FRAME & RAINBOW HUD
     -- ==========================================
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
@@ -53,6 +53,62 @@ local success, err = pcall(function()
 
     local MainCorner = Instance.new("UICorner") MainCorner.CornerRadius = UDim.new(0, 12) MainCorner.Parent = MainFrame
     local MainStroke = Instance.new("UIStroke") MainStroke.Color = Color3.fromRGB(255, 40, 70) MainStroke.Thickness = 2.5 MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border MainStroke.Parent = MainFrame
+
+    -- Rainbow Minimized Widget
+    local RainbowWidget = Instance.new("Frame")
+    RainbowWidget.Name = "RainbowWidget"
+    RainbowWidget.Size = UDim2.new(0, 160, 0, 36)
+    RainbowWidget.Position = UDim2.new(0.5, -80, 0, 15)
+    RainbowWidget.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
+    RainbowWidget.BorderSizePixel = 0
+    RainbowWidget.Visible = false
+    RainbowWidget.Parent = ScreenGui
+
+    local WidgetCorner = Instance.new("UICorner") WidgetCorner.CornerRadius = UDim.new(0, 10) WidgetCorner.Parent = RainbowWidget
+    local WidgetStroke = Instance.new("UIStroke") WidgetStroke.Thickness = 2 WidgetStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border WidgetStroke.Parent = RainbowWidget
+
+    local WidgetText = Instance.new("TextLabel")
+    WidgetText.Size = UDim2.new(1, 0, 1, 0)
+    WidgetText.BackgroundTransparency = 1
+    WidgetText.Text = "quatrojoke"
+    WidgetText.Font = Enum.Font.FredokaOne
+    WidgetText.TextSize = 16
+    WidgetText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    WidgetText.Parent = RainbowWidget
+
+    local WidgetBtn = Instance.new("TextButton")
+    WidgetBtn.Size = UDim2.new(1, 0, 1, 0)
+    WidgetBtn.BackgroundTransparency = 1
+    WidgetBtn.Text = ""
+    WidgetBtn.Parent = RainbowWidget
+
+    -- Notification Toast
+    local ToastFrame = Instance.new("Frame")
+    ToastFrame.Name = "ToastFrame"
+    ToastFrame.Size = UDim2.new(0, 240, 0, 42)
+    ToastFrame.Position = UDim2.new(1, 20, 1, -55)
+    ToastFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+    ToastFrame.BorderSizePixel = 0
+    ToastFrame.Parent = ScreenGui
+
+    local ToastCorner = Instance.new("UICorner") ToastCorner.CornerRadius = UDim.new(0, 8) ToastCorner.Parent = ToastFrame
+    local ToastStroke = Instance.new("UIStroke") ToastStroke.Color = Color3.fromRGB(255, 40, 70) ToastStroke.Thickness = 1.5 ToastStroke.Parent = ToastFrame
+
+    local ToastText = Instance.new("TextLabel")
+    ToastText.Size = UDim2.new(1, 0, 1, 0)
+    ToastText.BackgroundTransparency = 1
+    ToastText.Text = "📌 Скрипт скрыт (LeftControl)"
+    ToastText.Font = Enum.Font.GothamMedium
+    ToastText.TextSize = 12
+    ToastText.TextColor3 = Color3.fromRGB(220, 220, 230)
+    ToastText.Parent = ToastFrame
+
+    local function ShowToast()
+        ToastFrame:TweenPosition(UDim2.new(1, -250, 1, -55), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.4, true)
+        task.delay(3, function()
+            ToastFrame:TweenPosition(UDim2.new(1, 20, 1, -55), Enum.EasingDirection.In, Enum.EasingStyle.Quart, 0.4, true)
+        end)
+    end
 
     -- Top Bar
     local TopBar = Instance.new("Frame")
@@ -82,8 +138,27 @@ local success, err = pcall(function()
     CloseBtn.TextColor3 = Color3.fromRGB(255, 80, 100)
     CloseBtn.TextSize = 14
     CloseBtn.Parent = TopBar
-
     local CloseCorner = Instance.new("UICorner") CloseCorner.CornerRadius = UDim.new(0, 8) CloseCorner.Parent = CloseBtn
+
+    local MinimizeBtn = Instance.new("TextButton")
+    MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+    MinimizeBtn.Position = UDim2.new(1, -74, 0, 7)
+    MinimizeBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+    MinimizeBtn.Text = "—"
+    MinimizeBtn.Font = Enum.Font.GothamBold
+    MinimizeBtn.TextColor3 = Color3.fromRGB(200, 200, 220)
+    MinimizeBtn.TextSize = 14
+    MinimizeBtn.Parent = TopBar
+    local MinCorner = Instance.new("UICorner") MinCorner.CornerRadius = UDim.new(0, 8) MinCorner.Parent = MinimizeBtn
+
+    local function ToggleMinimize()
+        MainFrame.Visible = not MainFrame.Visible
+        RainbowWidget.Visible = not MainFrame.Visible
+        if not MainFrame.Visible then ShowToast() end
+    end
+
+    MinimizeBtn.MouseButton1Click:Connect(ToggleMinimize)
+    WidgetBtn.MouseButton1Click:Connect(ToggleMinimize)
 
     CloseBtn.MouseButton1Click:Connect(function() 
         FXContainer:Destroy()
@@ -179,15 +254,15 @@ local success, err = pcall(function()
     StatusLabel.Size = UDim2.new(1, 0, 0, 25)
     StatusLabel.Position = UDim2.new(0, 0, 0.6, 12)
     StatusLabel.BackgroundTransparency = 1
-    StatusLabel.Text = "Инициализация..."
+    StatusLabel.Text = "Загрузка..."
     StatusLabel.Font = Enum.Font.Gotham
     StatusLabel.TextSize = 13
     StatusLabel.TextColor3 = Color3.fromRGB(140, 140, 150)
     StatusLabel.Parent = IntroFrame
 
     math.randomseed(os.time())
-    local loadTime = math.random(4, 10)
-    local statuses = {"Проверка инжекции...", "Настройка функций...", "Подготовка GUI...", "Запуск quatrojoke..."}
+    local loadTime = math.random(3, 7)
+    local statuses = {"Подготовка графики...", "Восстановление FX...", "Синхронизация...", "Запуск quatrojoke..."}
 
     task.spawn(function()
         local elapsed = 0
@@ -201,15 +276,15 @@ local success, err = pcall(function()
         end
         
         StatusLabel.Text = "Готово!"
-        task.wait(0.3)
+        task.wait(0.2)
         
-        local fadeTween = TweenService:Create(IntroFrame, TweenInfo.new(0.5), {BackgroundTransparency = 1})
-        TweenService:Create(IntroTitle, TweenInfo.new(0.4), {TextTransparency = 1, TextStrokeTransparency = 1}):Play()
-        TweenService:Create(IntroSub, TweenInfo.new(0.4), {TextTransparency = 1}):Play()
-        TweenService:Create(BarBg, TweenInfo.new(0.4), {BackgroundTransparency = 1}):Play()
-        TweenService:Create(BarFill, TweenInfo.new(0.4), {BackgroundTransparency = 1}):Play()
-        TweenService:Create(StatusLabel, TweenInfo.new(0.4), {TextTransparency = 1}):Play()
-        TweenService:Create(IntroStroke, TweenInfo.new(0.4), {Transparency = 1}):Play()
+        local fadeTween = TweenService:Create(IntroFrame, TweenInfo.new(0.4), {BackgroundTransparency = 1})
+        TweenService:Create(IntroTitle, TweenInfo.new(0.3), {TextTransparency = 1, TextStrokeTransparency = 1}):Play()
+        TweenService:Create(IntroSub, TweenInfo.new(0.3), {TextTransparency = 1}):Play()
+        TweenService:Create(BarBg, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
+        TweenService:Create(BarFill, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
+        TweenService:Create(StatusLabel, TweenInfo.new(0.3), {TextTransparency = 1}):Play()
+        TweenService:Create(IntroStroke, TweenInfo.new(0.3), {Transparency = 1}):Play()
         
         fadeTween:Play()
         fadeTween.Completed:Connect(function()
@@ -226,7 +301,7 @@ local success, err = pcall(function()
             Innocent = { Enabled = false, Color = Color3.fromRGB(0, 255, 120), Transparency = 1 },
             Sheriff  = { Enabled = false, Color = Color3.fromRGB(0, 140, 255), Transparency = 1 },
             Murder   = { Enabled = false, Color = Color3.fromRGB(255, 40, 70), Transparency = 1 },
-            Gun      = { Enabled = false, Color = Color3.fromRGB(255, 200, 0), Transparency = 1, AlertEnabled = false }
+            Gun      = { Enabled = false, Color = Color3.fromRGB(255, 200, 0), Transparency = 1 }
         },
         Tracers = {
             Innocent = { Enabled = false, Color = Color3.fromRGB(0, 255, 120), Transparency = 1 },
@@ -246,6 +321,7 @@ local success, err = pcall(function()
             Kill = { Enabled = false, SoundId = "rbxassetid://4590657391" },
             MurderKill = { Enabled = false, SoundId = "rbxassetid://6026985010" }
         },
+        Fling = { SelfEnabled = false },
         AntiFling = { Enabled = false },
         Movement = {
             Fly = { Enabled = false, Speed = 50, BatmanAnim = false },
@@ -253,8 +329,6 @@ local success, err = pcall(function()
             Noclip = { Enabled = false }
         }
     }
-
-    local SelectedFlingTarget = nil
 
     -- ==========================================
     -- TABS & UI BUILDER
@@ -520,90 +594,17 @@ local success, err = pcall(function()
     CreateSection(TabSounds, Config.Sounds.MurderKill, "Kill Sound (Murder)", {Color = false, Transparency = false, ExpandedHeight = 40})
 
     -- Fling Tab
-    CreateHeader(TabFling, "FLING TARGETS")
-
-    local PlayerListFrame = Instance.new("ScrollingFrame")
-    PlayerListFrame.Size = UDim2.new(1, -8, 0, 180)
-    PlayerListFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
-    PlayerListFrame.ScrollBarThickness = 4
-    PlayerListFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 40, 70)
-    PlayerListFrame.Parent = TabFling
-
-    local pListCorner = Instance.new("UICorner") pListCorner.CornerRadius = UDim.new(0, 8) pListCorner.Parent = PlayerListFrame
-    local pListLayout = Instance.new("UIListLayout") pListLayout.Padding = UDim.new(0, 4) pListLayout.Parent = PlayerListFrame
-
-    local function RefreshPlayerList()
-        PlayerListFrame:ClearAllChildren()
-        local layout = Instance.new("UIListLayout") layout.Padding = UDim.new(0, 4) layout.Parent = PlayerListFrame
-        
-        for _, plr in pairs(Players:GetPlayers()) do
-            if plr ~= LocalPlayer then
-                local pBtn = Instance.new("TextButton")
-                pBtn.Size = UDim2.new(1, -8, 0, 28)
-                pBtn.BackgroundColor3 = (SelectedFlingTarget == plr) and Color3.fromRGB(50, 20, 35) or Color3.fromRGB(25, 25, 35)
-                pBtn.Text = plr.DisplayName .. " (@" .. plr.Name .. ")"
-                pBtn.Font = Enum.Font.GothamMedium
-                pBtn.TextSize = 12
-                pBtn.TextColor3 = Color3.fromRGB(220, 220, 230)
-                pBtn.Parent = PlayerListFrame
-                
-                local c = Instance.new("UICorner") c.CornerRadius = UDim.new(0, 6) c.Parent = pBtn
-                pBtn.MouseButton1Click:Connect(function()
-                    SelectedFlingTarget = plr
-                    RefreshPlayerList()
-                end)
-            end
-        end
-        PlayerListFrame.CanvasSize = UDim2.new(0, 0, 0, #Players:GetPlayers() * 32)
-    end
-
-    RefreshPlayerList()
-    Players.PlayerAdded:Connect(RefreshPlayerList)
-    Players.PlayerRemoving:Connect(RefreshPlayerList)
-
-    local FlingActionBtn = Instance.new("TextButton")
-    FlingActionBtn.Size = UDim2.new(1, -8, 0, 36)
-    FlingActionBtn.BackgroundColor3 = Color3.fromRGB(255, 40, 70)
-    FlingActionBtn.Text = "⚡ ВЫПОЛНИТЬ FLING"
-    FlingActionBtn.Font = Enum.Font.GothamBold
-    FlingActionBtn.TextSize = 13
-    FlingActionBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    FlingActionBtn.Parent = TabFling
-
-    local faCorner = Instance.new("UICorner") faCorner.CornerRadius = UDim.new(0, 8) faCorner.Parent = FlingActionBtn
-
-    FlingActionBtn.MouseButton1Click:Connect(function()
-        if SelectedFlingTarget and SelectedFlingTarget.Character and SelectedFlingTarget.Character:FindFirstChild("HumanoidRootPart") then
-            local targetHrp = SelectedFlingTarget.Character.HumanoidRootPart
-            local myChar = LocalPlayer.Character
-            local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
-            
-            if myHrp then
-                task.spawn(function()
-                    local bV = Instance.new("BodyAngularVelocity")
-                    bV.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
-                    bV.AngularVelocity = Vector3.new(99999, 99999, 99999)
-                    bV.Parent = myHrp
-                    
-                    for i = 1, 40 do
-                        if not targetHrp or not targetHrp.Parent then break end
-                        myHrp.CFrame = targetHrp.CFrame
-                        task.wait(0.02)
-                    end
-                    bV:Destroy()
-                end)
-            end
-        end
-    end)
+    CreateHeader(TabFling, "SELF FLING MODE")
+    CreateSection(TabFling, Config.Fling, "Self Fling (Рванина собою)", {Color = false, Transparency = false, ExpandedHeight = 40})
 
     CreateHeader(TabFling, "PROTECTION")
     CreateSection(TabFling, Config.AntiFling, "Anti Fling (Защита)", {Color = false, Transparency = false, ExpandedHeight = 40})
 
-    -- Visual FX
+    -- Visual FX Tab
     CreateHeader(TabFX, "EFFECTS")
-    CreateSection(TabFX, Config.Aura, "Player Aura")
+    CreateSection(TabFX, Config.Aura, "Player Aura Effect")
     CreateSection(TabFX, Config.Angel, "3D Angel Wings")
-    CreateSection(TabFX, Config.DemonArms, "Demon Arms (Клешни)")
+    CreateSection(TabFX, Config.DemonArms, "Demon Arms (Вторые руки)")
 
     -- Movement Tab
     CreateHeader(TabMove, "MOVEMENT")
@@ -612,8 +613,53 @@ local success, err = pcall(function()
     CreateSection(TabMove, Config.Movement.Noclip, "Noclip (Сквозь стены)", {Color = false, Transparency = false, ExpandedHeight = 40})
 
     -- ==========================================
-    -- ENGINE LOOP & DEMON ARMS CREATION (In-Engine)
+    -- VISUAL FX GENERATORS (Wings, Aura, Demon Arms)
     -- ==========================================
+    
+    -- 1. Spiral Aura
+    local auraBars = {}
+    for i = 1, 6 do
+        local bar = Instance.new("Part")
+        bar.Size = Vector3.new(0.2, 1.8, 0.2)
+        bar.CanCollide = false bar.Anchored = true bar.Material = Enum.Material.Neon bar.Transparency = 1 bar.Parent = FXContainer
+        table.insert(auraBars, bar)
+    end
+
+    -- 2. 3D Angel Wings
+    local wing3DFeathers = {}
+    for side = -1, 1, 2 do
+        for layer = 1, 3 do
+            for i = 1, 4 do
+                local feather = Instance.new("Part")
+                feather.CanCollide = false feather.Anchored = true feather.Material = Enum.Material.SmoothPlastic feather.Transparency = 1 feather.Parent = FXContainer
+                
+                local mesh = Instance.new("SpecialMesh")
+                mesh.MeshType = Enum.MeshType.Wedge
+                mesh.Scale = Vector3.new(0.1, 1.5 + (i * 0.3), 0.3)
+                mesh.Parent = feather
+                
+                table.insert(wing3DFeathers, {Part = feather, Side = side, Layer = layer, Index = i})
+            end
+        end
+    end
+
+    -- 3. Volumetric Demon Arms (Solid Lego Claws)
+    local demonArmsParts = {}
+    for side = -1, 1, 2 do
+        local armUpper = Instance.new("Part")
+        armUpper.Size = Vector3.new(0.45, 1.6, 0.45)
+        armUpper.CanCollide = false armUpper.Anchored = true armUpper.Material = Enum.Material.SmoothPlastic armUpper.Transparency = 1 armUpper.Parent = FXContainer
+        
+        local clawLeft = Instance.new("Part")
+        clawLeft.Size = Vector3.new(0.2, 0.8, 0.3)
+        clawLeft.CanCollide = false clawLeft.Anchored = true clawLeft.Material = Enum.Material.SmoothPlastic clawLeft.Transparency = 1 clawLeft.Parent = FXContainer
+        
+        local clawRight = clawLeft:Clone() clawRight.Parent = FXContainer
+        
+        table.insert(demonArmsParts, {Upper = armUpper, ClawL = clawLeft, ClawR = clawRight, Side = side})
+    end
+
+    -- Helper Role Finder
     local function GetPlayerRole(plr)
         if not plr or not plr.Character then return "Innocent" end
         local backpack = plr:FindFirstChild("Backpack")
@@ -625,37 +671,39 @@ local success, err = pcall(function()
         return "Innocent"
     end
 
-    local function GetDroppedGun()
-        for _, obj in pairs(Workspace:GetDescendants()) do
-            if obj.Name == "GunDrop" or (obj:IsA("Tool") and (obj.Name == "Gun" or obj.Name == "Revolver")) then
-                if not obj:IsDescendantOf(Players) then return obj end
-            end
-        end
-        return nil
-    end
-
-    -- Safe Demon Arms Setup (Without external MeshId crashes)
-    local demonArmsParts = {}
-    for side = -1, 1, 2 do
-        local armUpper = Instance.new("Part")
-        armUpper.Size = Vector3.new(0.5, 1.8, 0.5)
-        armUpper.CanCollide = false armUpper.Anchored = true armUpper.Material = Enum.Material.SmoothPlastic armUpper.Transparency = 1 armUpper.Parent = FXContainer
-        
-        local clawBase = Instance.new("Part")
-        clawBase.Size = Vector3.new(0.7, 0.5, 0.7)
-        clawBase.CanCollide = false clawBase.Anchored = true clawBase.Material = Enum.Material.SmoothPlastic clawBase.Transparency = 1 clawBase.Parent = FXContainer
-        
-        table.insert(demonArmsParts, {Upper = armUpper, Claw = clawBase, Side = side})
-    end
-
-    -- Main Engine Loop
+    -- ==========================================
+    -- ENGINE RENDER LOOP (Optimized & Clean)
+    -- ==========================================
+    local auraAngle = 0
+    local wingFlap = 0
     local armBob = 0
+    local hue = 0
+
+    local bodyVel = Instance.new("BodyVelocity") bodyVel.MaxForce = Vector3.new(0, 0, 0)
+    local bodyGyro = Instance.new("BodyGyro") bodyGyro.MaxTorque = Vector3.new(0, 0, 0)
+    local flingVel = Instance.new("BodyAngularVelocity") flingVel.MaxTorque = Vector3.new(0, 0, 0)
+
     RunService.RenderStepped:Connect(function()
         local char = LocalPlayer.Character
         local hrp = char and char:FindFirstChild("HumanoidRootPart")
         local hum = char and char:FindFirstChild("Humanoid")
-        
-        -- Anti-Fling
+
+        -- Rainbow Color-Shifting Minimized Widget
+        if RainbowWidget.Visible then
+            hue = (hue + 0.005) % 1
+            WidgetStroke.Color = Color3.fromHSV(hue, 0.8, 1)
+        end
+
+        -- Self-Fling Engine
+        if Config.Fling.Enabled and hrp then
+            flingVel.Parent = hrp
+            flingVel.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
+            flingVel.AngularVelocity = Vector3.new(9999, 9999, 9999)
+        else
+            flingVel.MaxTorque = Vector3.new(0, 0, 0)
+        end
+
+        -- Anti-Fling Engine
         if Config.AntiFling.Enabled and hrp then
             for _, v in pairs(Workspace:GetChildren()) do
                 if v:IsA("Model") and v ~= char and v:FindFirstChild("HumanoidRootPart") then
@@ -670,34 +718,87 @@ local success, err = pcall(function()
                 end
             end
         end
-        
-        -- Demon Arms Motion[cite: 3]
+
+        -- Spiral Aura FX
+        local cfgA = Config.Aura
+        if cfgA.Enabled and hrp then
+            auraAngle = auraAngle + 0.05
+            for i, bar in ipairs(auraBars) do
+                local offset = auraAngle + (i * (math.pi / 3))
+                local radius = 3.2
+                local x = math.cos(offset) * radius
+                local z = math.sin(offset) * radius
+                local y = math.sin(auraAngle * 2 + i) * 1.5
+                bar.CFrame = CFrame.new(hrp.Position + Vector3.new(x, y, z)) * CFrame.Angles(offset, offset * 0.5, 0)
+                bar.Color = cfgA.Color
+                bar.Transparency = 1 - cfgA.Transparency
+            end
+        else
+            for _, bar in ipairs(auraBars) do bar.Transparency = 1 end
+        end
+
+        -- 3D Angel Wings FX
+        local cfgW = Config.Angel
+        if cfgW.Enabled and hrp then
+            local isMoving = (hum and hum.MoveDirection.Magnitude > 0) or Config.Movement.Fly.Enabled
+            wingFlap = wingFlap + (isMoving and 0.05 or 0.025)
+            local flapRad = math.sin(wingFlap) * (isMoving and 0.25 or 0.1)
+            
+            for _, fData in ipairs(wing3DFeathers) do
+                local p = fData.Part
+                local side = fData.Side
+                local layer = fData.Layer
+                local i = fData.Index
+                
+                local archX = side * (0.5 + (i * 0.42) + (layer * 0.12))
+                local archY = 0.6 + (i * 0.38) - (layer * 0.35) + flapRad
+                local archZ = 0.6 + (layer * 0.18) + (i * 0.08)
+                
+                local rotX = math.rad(-20 + (i * 6))
+                local rotY = side * (math.rad(35 + i * 10) + (flapRad * 20))
+                local rotZ = side * (math.rad(-45 - i * 8) + (flapRad * 12))
+                
+                local targetCF = hrp.CFrame * CFrame.new(archX, archY, archZ) * CFrame.Angles(rotX, rotY, rotZ)
+                p.CFrame = p.CFrame:Lerp(targetCF, 0.25)
+                p.Color = cfgW.Color
+                p.Transparency = 1 - cfgW.Transparency
+            end
+        else
+            for _, fData in ipairs(wing3DFeathers) do fData.Part.Transparency = 1 end
+        end
+
+        -- Demon Arms FX (Volumetric Lego Claws)[cite: 3]
         local cfgDA = Config.DemonArms
         if cfgDA.Enabled and hrp then
             armBob = armBob + 0.04
-            local bobY = math.sin(armBob) * 0.2
+            local bobY = math.sin(armBob) * 0.18
             
             for _, arm in ipairs(demonArmsParts) do
                 local side = arm.Side
-                local targetUpperCF = hrp.CFrame * CFrame.new(side * 1.8, 0.6 + bobY, 0.8) * CFrame.Angles(math.rad(20), 0, side * math.rad(-30))
-                local targetClawCF = targetUpperCF * CFrame.new(0, 1.1, -0.3) * CFrame.Angles(math.rad(45), 0, 0)
+                local targetUpperCF = hrp.CFrame * CFrame.new(side * 1.6, 0.5 + bobY, 0.7) * CFrame.Angles(math.rad(25), 0, side * math.rad(-25))
+                local targetClawLCF = targetUpperCF * CFrame.new(-0.25, 0.9, -0.3) * CFrame.Angles(math.rad(40), math.rad(-20), 0)
+                local targetClawRCF = targetUpperCF * CFrame.new(0.25, 0.9, -0.3) * CFrame.Angles(math.rad(40), math.rad(20), 0)
                 
                 arm.Upper.CFrame = arm.Upper.CFrame:Lerp(targetUpperCF, 0.25)
-                arm.Claw.CFrame = arm.Claw.CFrame:Lerp(targetClawCF, 0.25)
+                arm.ClawL.CFrame = arm.ClawL.CFrame:Lerp(targetClawLCF, 0.25)
+                arm.ClawR.CFrame = arm.ClawR.CFrame:Lerp(targetClawRCF, 0.25)
                 
                 arm.Upper.Color = cfgDA.Color
-                arm.Claw.Color = cfgDA.Color
+                arm.ClawL.Color = cfgDA.Color
+                arm.ClawR.Color = cfgDA.Color
                 arm.Upper.Transparency = 1 - cfgDA.Transparency
-                arm.Claw.Transparency = 1 - cfgDA.Transparency
+                arm.ClawL.Transparency = 1 - cfgDA.Transparency
+                arm.ClawR.Transparency = 1 - cfgDA.Transparency
             end
         else
             for _, arm in ipairs(demonArmsParts) do
                 arm.Upper.Transparency = 1
-                arm.Claw.Transparency = 1
+                arm.ClawL.Transparency = 1
+                arm.ClawR.Transparency = 1
             end
         end
-        
-        -- Tracers & 3D Boxes
+
+        -- ESP Rendering (Tracers & 3D Boxes)
         DrawingCanvas:ClearAllChildren()
         for _, plr in pairs(Players:GetPlayers()) do
             if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
@@ -706,6 +807,7 @@ local success, err = pcall(function()
                 local pos, onScreen = Camera:WorldToScreenPoint(p_hrp.Position)
                 
                 if onScreen then
+                    -- Tracers
                     local cfgT = Config.Tracers[role]
                     if cfgT and cfgT.Enabled and cfgT.Transparency > 0 then
                         local line = Instance.new("Frame")
@@ -723,6 +825,7 @@ local success, err = pcall(function()
                         line.Parent = DrawingCanvas
                     end
                     
+                    -- 3D Box ESP
                     local cfgB = Config.Boxes[role]
                     if cfgB and cfgB.Enabled and cfgB.Transparency > 0 then
                         local cSize = plr.Character:GetExtentsSize()
@@ -748,16 +851,12 @@ local success, err = pcall(function()
         end
     end)
 
-    -- Keybind Toggle UI (Left Control)
-    local minimized = false
+    -- Keybind LeftControl Toggle
     UserInputService.InputBegan:Connect(function(input, gpe)
         if not gpe and input.KeyCode == Enum.KeyCode.LeftControl then
-            minimized = not minimized
-            MainFrame.Visible = not minimized
+            ToggleMinimize()
         end
     end)
 end)
 
-if not success then
-    warn("quatrojoke Load Error: " .. tostring(err))
-end
+if not success then warn("quatrojoke Error: " .. tostring(err)) end
